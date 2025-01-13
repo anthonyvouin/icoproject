@@ -37,10 +37,7 @@ export async function POST(request: Request) {
     const { password: _, ...userWithoutPassword } = user;
 
     const response = NextResponse.json(
-      {
-        token,
-        user: userWithoutPassword,
-      },
+      { user: userWithoutPassword, token },
       { status: 200 }
     );
 

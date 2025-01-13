@@ -2,31 +2,39 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ILoginForm } from "@/types/auth";
-import { userApi } from "@/services/api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState<string>("");
-  const [formData, setFormData] = useState<ILoginForm>({
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await userApi.login(formData);
-      if (response.error) {
-        throw new Error(response.error);
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Une erreur est survenue");
+        return;
       }
 
       router.push("/");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError("Une erreur est survenue");
     }
   };
 

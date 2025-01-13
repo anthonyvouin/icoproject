@@ -1,46 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { IRegisterForm } from "@/types/user";
-import { userApi } from "@/services/api";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<boolean>(false);
-  const [formData, setFormData] = useState<IRegisterForm>({
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
     email: "",
-    name: "",
     password: "",
-    confirmPassword: "",
+    name: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess(false);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
 
     try {
-      const { confirmPassword, ...registerData } = formData;
-      await userApi.register(registerData);
-
-      setSuccess(true);
-      setFormData({
-        email: "",
-        name: "",
-        password: "",
-        confirmPassword: "",
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-    } catch (err: any) {
-      setError(err.message);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Une erreur est survenue");
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      setError("Une erreur est survenue");
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -63,35 +62,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {success && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
-              <p className="text-green-700">
-                Inscription réussie ! Votre compte a été créé avec succès.
-              </p>
-            </div>
-          )}
-
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-
             <div>
               <label
                 htmlFor="name"
@@ -114,6 +85,26 @@ export default function RegisterPage() {
 
             <div>
               <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -126,26 +117,6 @@ export default function RegisterPage() {
                   type="password"
                   required
                   value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirmer le mot de passe
-              </label>
-              <div className="mt-1">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
