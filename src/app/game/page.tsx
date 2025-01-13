@@ -28,6 +28,8 @@ export default function Game() {
   });
 
   const [playerCount, setPlayerCount] = useState<number>(7);
+  const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const [showingRole, setShowingRole] = useState<number | null>(null);
 
   const initializeGame = (numPlayers: number) => {
     const roles = [];
@@ -44,7 +46,7 @@ export default function Game() {
       .fill(null)
       .map((_, index) => ({
         id: index,
-        name: `Joueur ${index + 1}`,
+        name: playerNames[index] || `Joueur ${index + 1}`,
         role: shuffledRoles[index],
         bonusCard: drawBonusCard(bonusCards),
         hasVoted: false,
@@ -184,21 +186,51 @@ export default function Game() {
           <div className="max-w-4xl mx-auto p-4">
             <h1 className="text-3xl font-bold text-center mb-8">ICO!</h1>
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Nombre de joueurs</h2>
-              <select
-                value={playerCount}
-                onChange={(e) => setPlayerCount(Number(e.target.value))}
-                className="w-full p-2 border rounded mb-4"
-              >
-                {Array.from({ length: 14 }, (_, i) => i + 7).map((num) => (
-                  <option key={num} value={num}>
-                    {num} joueurs
-                  </option>
-                ))}
-              </select>
+              <h2 className="text-xl font-bold mb-4">
+                Configuration de la partie
+              </h2>
+              <div className="mb-6">
+                <label className="block text-gray-700 mb-2">
+                  Nombre de joueurs (7-20)
+                </label>
+                <select
+                  value={playerCount}
+                  onChange={(e) => {
+                    const count = Number(e.target.value);
+                    setPlayerCount(count);
+                    setPlayerNames(Array(count).fill(""));
+                  }}
+                  className="w-full p-2 border rounded mb-4"
+                >
+                  {Array.from({ length: 14 }, (_, i) => i + 7).map((num) => (
+                    <option key={num} value={num}>
+                      {num} joueurs
+                    </option>
+                  ))}
+                </select>
+
+                <div className="space-y-3">
+                  {Array.from({ length: playerCount }, (_, index) => (
+                    <div key={index} className="flex items-center">
+                      <label className="w-24">Joueur {index + 1}:</label>
+                      <input
+                        type="text"
+                        value={playerNames[index] || ""}
+                        onChange={(e) => {
+                          const newNames = [...playerNames];
+                          newNames[index] = e.target.value;
+                          setPlayerNames(newNames);
+                        }}
+                        placeholder={`Nom du joueur ${index + 1}`}
+                        className="flex-1 p-2 border rounded"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
               <button
                 onClick={() => initializeGame(playerCount)}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded"
+                className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
               >
                 Commencer la partie
               </button>
@@ -217,14 +249,27 @@ export default function Game() {
               {gameState.players.map((player) => (
                 <div key={player.id} className="p-4 border rounded">
                   <h3 className="font-bold">{player.name}</h3>
-                  <p>Rôle : {player.role}</p>
-                  <p>Carte bonus : {player.bonusCard}</p>
+                  <button
+                    onClick={() => setShowingRole(player.id)}
+                    className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+                  >
+                    Voir mon rôle
+                  </button>
+                  {showingRole === player.id && (
+                    <div className="mt-2">
+                      <p>Rôle : {player.role}</p>
+                      <p>Carte bonus : {player.bonusCard}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
             <button
-              onClick={handlePhaseChange}
-              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded"
+              onClick={() => {
+                setShowingRole(null);
+                handlePhaseChange();
+              }}
+              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
             >
               Fermer les yeux
             </button>
