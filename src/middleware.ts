@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { jwtVerify, JWTPayload } from "jose";
+
+interface JWTCustomPayload extends JWTPayload {
+  userId: string;
+  email: string;
+}
 
 const publicRoutes = ["/login", "/register", "/api/login", "/api/register"];
 
@@ -21,23 +26,39 @@ export async function middleware(request: NextRequest) {
     const secret = new TextEncoder().encode(
       process.env.JWT_SECRET || "your-secret-key"
     );
-    await jwtVerify(token.value, secret);
 
-    return NextResponse.next();
+    const { payload } = await jwtVerify(token.value, secret);
+    const userPayload = payload as JWTCustomPayload;
+
+    // Vérifications supplémentaires
+    if (!userPayload.userId || !userPayload.email) {
+      throw new Error("Token invalide: informations manquantes");
+    }
+
+    // Vérifier si le token n'est pas expiré (en plus de la vérification automatique de jwtVerify)
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < currentTimestamp) {
+      throw new Error("Token expiré");
+    }
+
+    // Optionnel: Ajouter les informations de l'utilisateur aux headers
+    // pour les rendre disponibles dans vos routes
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-user-id", userPayload.userId);
+    requestHeaders.set("x-user-email", userPayload.email);
+
+    // Continuer avec les headers modifiés
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   } catch (error) {
+    console.error("Erreur de vérification du token:", error);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * 1. /api/auth/* (auth routes)
-     * 2. /_next/* (Next.js internals)
-     * 3. /fonts/* (inside public directory)
-     * 4. /favicon.ico, /sitemap.xml (public files)
-     */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
 };
