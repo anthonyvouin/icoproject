@@ -54,3 +54,50 @@ export async function GET(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const headers = new Headers(request.headers);
+    const userRole = headers.get("x-user-role");
+    const adminId = headers.get("x-user-id");
+    const url = new URL(request.url);
+    const userId = url.searchParams.get("userId");
+
+    if (!adminId || !userRole) {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    }
+
+    if (userRole !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Accès non autorisé" },
+        { status: 403 }
+      );
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "ID utilisateur requis" },
+        { status: 400 }
+      );
+    }
+
+    if (adminId === userId) {
+      return NextResponse.json(
+        { error: "Impossible de supprimer votre propre compte" },
+        { status: 400 }
+      );
+    }
+
+    await prisma.user.delete({
+      where: { id: parseInt(userId) },
+    });
+
+    return NextResponse.json({ message: "Utilisateur supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'utilisateur:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression de l'utilisateur" },
+      { status: 500 }
+    );
+  }
+}

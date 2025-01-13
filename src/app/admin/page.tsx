@@ -26,6 +26,42 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fonction de suppression d'utilisateur
+  const handleDeleteUser = async (userId: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/users?userId=${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erreur lors de la suppression");
+      }
+
+      // Mise à jour de l'interface après suppression réussie
+      setUsers(users.filter(user => user.id !== userId));
+      setStats(prev => ({
+        ...prev,
+        totalUsers: prev.totalUsers - 1,
+        adminCount: users.find(u => u.id === userId)?.role === "ADMIN" 
+          ? prev.adminCount - 1 
+          : prev.adminCount
+      }));
+
+      alert("Utilisateur supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
+    }
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -33,16 +69,12 @@ export default function AdminDashboard() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(
-            data.error || "Erreur lors du chargement des utilisateurs"
-          );
+          throw new Error(data.error || "Erreur lors du chargement des utilisateurs");
         }
 
         setUsers(data);
 
-        const adminCount = data.filter(
-          (user: User) => user.role === "ADMIN"
-        ).length;
+        const adminCount = data.filter((user: User) => user.role === "ADMIN").length;
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const recentUsers = data.filter(
@@ -55,9 +87,7 @@ export default function AdminDashboard() {
           recentUsers,
         });
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Une erreur est survenue"
-        );
+        setError(err instanceof Error ? err.message : "Une erreur est survenue");
       } finally {
         setLoading(false);
       }
@@ -247,6 +277,9 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date d'inscription
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -294,6 +327,14 @@ export default function AdminDashboard() {
                           month: "long",
                           day: "numeric",
                         })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors duration-150"
+                        >
+                          Supprimer
+                        </button>
                       </td>
                     </tr>
                   ))}
