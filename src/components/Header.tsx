@@ -5,9 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  
- 
-
   return (
     <nav className="bg-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -5,11 +5,15 @@ import { jwtVerify } from "jose";
 interface JWTPayload {
   userId: number;
   email: string;
+  role: string;
   exp?: number;
 }
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const publicRoutes = ["/login", "/register", "/api/login", "/api/register"];
+
+// Routes qui nécessitent le rôle ADMIN
+const adminRoutes = ["/admin"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -36,7 +40,7 @@ export async function middleware(request: NextRequest) {
     const userPayload = payload as unknown as JWTPayload;
 
     // Vérifie que le token contient les informations requises
-    if (!userPayload.userId || !userPayload.email) {
+    if (!userPayload.userId || !userPayload.email || !userPayload.role) {
       console.error("Token invalide: informations manquantes");
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -47,10 +51,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Ajoute les informations de l'utilisateur aux headers pour les routes protégées
+    // Vérifie les permissions pour les routes admin
+    if (
+      adminRoutes.some((route) => pathname.startsWith(route)) &&
+      userPayload.role !== "ADMIN"
+    ) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // Ajoute les informations de l'utilisateur aux headers
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-user-id", userPayload.userId.toString());
     requestHeaders.set("x-user-email", userPayload.email);
+    requestHeaders.set("x-user-role", userPayload.role);
 
     return NextResponse.next({
       request: {
@@ -63,7 +76,6 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// Configuration des routes à protéger
 export const config = {
-  matcher: ["/profile", "/api/profile"],
+  matcher: ["/profile", "/api/profile", "/admin/:path*", "/api/admin/:path*"],
 };
