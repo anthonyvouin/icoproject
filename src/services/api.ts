@@ -1,10 +1,5 @@
 import { IUser, IRegisterForm } from "@/types/user";
-import {
-  IApiResponse,
-  IAuthenticatedUser,
-  ILoginForm,
-  ILoginResponse,
-} from "@/types/auth";
+
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -90,10 +85,8 @@ class ApiService {
   }
 }
 
-// Instance du service
 export const api = new ApiService();
 
-// Exemple d'utilisation avec des types spécifiques pour chaque endpoint
 export const userApi = {
   register: (data: Omit<IRegisterForm, "confirmPassword">) =>
     api.post<Omit<IUser, "password">, typeof data>("/register", data),

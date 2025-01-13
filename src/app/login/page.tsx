@@ -19,8 +19,8 @@ export default function LoginPage() {
 
     try {
       const response = await userApi.login(formData);
-      if (!response.token) {
-        throw new Error("Login failed");
+      if (response.error) {
+        throw new Error(response.error);
       }
 
       router.push("/");
