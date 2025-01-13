@@ -1,21 +1,25 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify, JWTPayload } from "jose";
+import { jwtVerify } from "jose";
 
-interface JWTCustomPayload extends JWTPayload {
-  userId: string;
+interface JWTPayload {
+  userId: number;
   email: string;
+  exp?: number;
 }
 
+// Routes publiques qui ne nécessitent pas d'authentification
 const publicRoutes = ["/login", "/register", "/api/login", "/api/register"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Si c'est une route publique, on laisse passer
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
+  // Vérifie le token d'authentification
   const token = request.cookies.get("auth_token");
 
   if (!token) {
@@ -27,27 +31,27 @@ export async function middleware(request: NextRequest) {
       process.env.JWT_SECRET || "your-secret-key"
     );
 
+    // Vérifie et décode le token
     const { payload } = await jwtVerify(token.value, secret);
-    const userPayload = payload as JWTCustomPayload;
+    const userPayload = payload as unknown as JWTPayload;
 
-    // Vérifications supplémentaires
+    // Vérifie que le token contient les informations requises
     if (!userPayload.userId || !userPayload.email) {
-      throw new Error("Token invalide: informations manquantes");
+      console.error("Token invalide: informations manquantes");
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Vérifier si le token n'est pas expiré (en plus de la vérification automatique de jwtVerify)
-    const currentTimestamp = Math.floor(Date.now() / 1000);
-    if (payload.exp && payload.exp < currentTimestamp) {
-      throw new Error("Token expiré");
+    // Vérifie si le token n'est pas expiré
+    if (userPayload.exp && userPayload.exp < Math.floor(Date.now() / 1000)) {
+      console.error("Token expiré");
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Optionnel: Ajouter les informations de l'utilisateur aux headers
-    // pour les rendre disponibles dans vos routes
+    // Ajoute les informations de l'utilisateur aux headers pour les routes protégées
     const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-user-id", userPayload.userId);
+    requestHeaders.set("x-user-id", userPayload.userId.toString());
     requestHeaders.set("x-user-email", userPayload.email);
 
-    // Continuer avec les headers modifiés
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -59,6 +63,7 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+// Configuration des routes à protéger
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/profile", "/api/profile"],
 };
