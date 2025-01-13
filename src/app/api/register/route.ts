@@ -22,10 +22,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Créer l'utilisateur
     const user = await prisma.user.create({
       data: {
         email,
@@ -34,7 +32,6 @@ export async function POST(request: Request) {
       },
     });
 
-    // Générer le token
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: "7d",
     });
