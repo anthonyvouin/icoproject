@@ -12,7 +12,12 @@
   "dependencies": {
     "@prisma/client": "^6.2.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/js-cookie": "^3.0.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.1.4",
     "prisma": "^6.2.1",
     "react": "^19.0.0",

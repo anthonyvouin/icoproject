@@ -1,4 +1,10 @@
 import { IUser, IRegisterForm } from "@/types/user";
+import {
+  IApiResponse,
+  IAuthenticatedUser,
+  ILoginForm,
+  ILoginResponse,
+} from "@/types/auth";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -50,7 +56,6 @@ class ApiService {
     return data;
   }
 
-  // Méthodes utilitaires pour simplifier les appels communs
   async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
     return this.request<T>({ endpoint, params });
   }
