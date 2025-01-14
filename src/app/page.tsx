@@ -21,10 +21,10 @@ export default function HomePage() {
                 </p>
                 <div className="space-x-4">
                   <Link 
-                    href="/shop"
+                    href="/game"
                     className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-md shadow-lg hover:shadow-indigo-500/30 transition-all"
                   >
-                    Acheter le jeu
+                    Jouer maintenant  
                   </Link>
                   <Link 
                     href="/rules"
