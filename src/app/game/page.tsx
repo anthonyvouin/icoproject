@@ -42,6 +42,8 @@ export default function Game() {
     {}
   );
 
+  const [isTimerLoading, setIsTimerLoading] = useState(true);
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -60,7 +62,9 @@ export default function Game() {
 
   useEffect(() => {
     const fetchTimer = async () => {
+      setIsTimerLoading(true);
       try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const response = await fetch("/api/admin/timer");
         const data = await response.json();
         if (data.timer) {
@@ -68,11 +72,43 @@ export default function Game() {
         }
       } catch (error) {
         console.error("Erreur lors de la récupération du timer:", error);
+      } finally {
+        setIsTimerLoading(false);
       }
     };
 
     fetchTimer();
   }, []);
+
+  useEffect(() => {
+    setTimerShowROle(timerForRoleRevel);
+  }, [timerForRoleRevel]);
+
+  // Démarrer le décompte quand on entre dans la phase eyes-open
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (gameState.phase === "eyes-open" && timerShowROle > 0) {
+      interval = setInterval(() => {
+        setTimerShowROle((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [gameState.phase, timerShowROle]);
+
+  // Ne pas afficher le timer tant qu'il n'est pas chargé
+  const displayTimer = isTimerLoading ? null : timerForRoleRevel;
 
   const initializeGame = (numPlayers: number, keepPlayers: boolean) => {
     // Vérification des noms des joueurs
