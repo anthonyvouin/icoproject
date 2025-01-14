@@ -43,5 +43,11 @@ model Rule {
   content   String   @db.Text
   order     Int      @default(0)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt 
+  updatedAt DateTime @updatedAt
+}
+
+model GameSettings {
+  id          Int      @id @default(autoincrement())
+  roundsToWin Int      @default(10)
+  updatedAt   DateTime @updatedAt
 }
