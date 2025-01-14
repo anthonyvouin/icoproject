@@ -32,7 +32,7 @@ export default function Game() {
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [showingRole, setShowingRole] = useState<number | null>(null);
   const timerForRoleRevel = 10; // Timer pour la révélation des rôles
-  const roundsForWin = 2; // Nombre de manches pour gagner
+  const [roundsForWin, setRoundsForWin] = useState(2); // Initialisation avec la valeur par défaut
   const [timerShowROle, setTimerShowROle] = useState(timerForRoleRevel);
   const [votesForCaptain, setVotesForCaptain] = useState<{
     [key: number]: number;
@@ -41,9 +41,27 @@ export default function Game() {
     {}
   );
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("/api/admin/game-settings");
+        const data = await response.json();
+        if (response.ok) {
+          setRoundsForWin(data.roundsToWin);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des paramètres:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   const initializeGame = (numPlayers: number, keepPlayers: boolean) => {
     // Vérification des noms des joueurs
-    const uniqueNames = new Set(playerNames.filter(name => name.trim() !== ""));
+    const uniqueNames = new Set(
+      playerNames.filter((name) => name.trim() !== "")
+    );
     if (uniqueNames.size !== numPlayers) {
       alert("Veuillez entrer un nom unique pour chaque joueur.");
       return;
@@ -51,14 +69,14 @@ export default function Game() {
 
     const roles = [];
     const distribution = getRoleDistribution(numPlayers);
-  
+
     for (let i = 0; i < distribution.pirates; i++) roles.push("pirate" as Role);
     for (let i = 0; i < distribution.marins; i++) roles.push("marin" as Role);
     roles.push("sirene" as Role);
-  
+
     const shuffledRoles = shuffleArray(roles);
     const bonusCards = createBonusDeck();
-  
+
     const players = keepPlayers
       ? gameState.players.map((player, index) => ({
           ...player,
@@ -79,7 +97,7 @@ export default function Game() {
             isInCrew: false,
             selectedCard: null,
           }));
-  
+
     setGameState({
       phase: "captain-vote",
       players,
@@ -95,10 +113,10 @@ export default function Game() {
       actionCardsDeck: createActionDeck(),
       winner: null,
     });
-  
+
     setVotesForCaptain({});
     setVotesForSiren({});
-  };  
+  };
 
   const handleVoteForCaptain = (voterId: number, targetId: number) => {
     setVotesForCaptain((prev) => {
@@ -138,31 +156,33 @@ export default function Game() {
   // Fonction pour confirmer la révélation du rôle d'un joueur
   const confirmRoleRevel = (playerId: number) => {
     // Demande de confirmation pour s'assurer que le joueur est bien celui qu'il prétend être
-    const confirmReveal = window.confirm("Êtes-ce que tu es bien " + gameState.players[playerId].name + " ?");
-    
+    const confirmReveal = window.confirm(
+      "Êtes-ce que tu es bien " + gameState.players[playerId].name + " ?"
+    );
+
     if (confirmReveal) {
       // Si la confirmation est positive, on met à jour l'état pour montrer le rôle du joueur
       setShowingRole(playerId);
 
       // Affichage d'une alerte avec le rôle du joueur
       alert("Tu es " + gameState.players[playerId].role + " !");
-      
+
       // Si le joueur a une carte bonus, on affiche également une alerte avec cette information
       if (gameState.players[playerId].bonusCard !== null) {
         alert("Ta carte bonus est : " + gameState.players[playerId].bonusCard);
       }
     }
-  }
+  };
 
   // Timer pour la phase de révélation des rôles
   useEffect(() => {
     if (timerShowROle > 0) {
-  const timer = setTimeout(() => {
-    setTimerShowROle(timerShowROle - 1);
-  }, 1000);
-  return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        setTimerShowROle(timerShowROle - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
     } else {
-  handlePhaseChange();
+      handlePhaseChange();
     }
   }, [timerShowROle]);
 
@@ -423,13 +443,13 @@ export default function Game() {
                       </div>
                     ))}
 
-                  <button
-                    onClick={() => initializeGame(playerCount, false)}
-                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
-                  >
-                    Commencer la partie
-                  </button>
-                </div>
+                    <button
+                      onClick={() => initializeGame(playerCount, false)}
+                      className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+                    >
+                      Commencer la partie
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -443,49 +463,51 @@ export default function Game() {
             <h2 className="text-2xl font-bold mb-4">Élection du Capitaine</h2>
             <div className="grid grid-cols-2 gap-4">
               {gameState.players.map((voter, index) => {
-              // Vérifier si le joueur a déjà voté
-              const hasVoted = votesForCaptain[voter.id] !== undefined;
+                // Vérifier si le joueur a déjà voté
+                const hasVoted = votesForCaptain[voter.id] !== undefined;
 
-              // Vérifier si c'est le tour du joueur actuel
-              const isCurrentVoter = Object.keys(votesForCaptain).length === index;
+                // Vérifier si c'est le tour du joueur actuel
+                const isCurrentVoter =
+                  Object.keys(votesForCaptain).length === index;
 
-              return (
-                <div key={voter.id} className="p-4 border rounded">
-                  <h3 className="font-bold mb-2">{voter.name}</h3>
-                  {!hasVoted && isCurrentVoter ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
-                      Votez pour un capitaine :
-                    </p>
-                    <div className="grid gap-2">
-                      {gameState.players
-                        .filter((p) => p.id !== voter.id)
-                        .map((candidate) => (
-                        <button key={candidate.id} 
-                        className="bg-indigo-600 text-white py-1 px-3 rounded hover:bg-indigo-700 transition-colors"
-                        onClick={() => 
-                          handleVoteForCaptain(voter.id, candidate.id)
+                return (
+                  <div key={voter.id} className="p-4 border rounded">
+                    <h3 className="font-bold mb-2">{voter.name}</h3>
+                    {!hasVoted && isCurrentVoter ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Votez pour un capitaine :
+                        </p>
+                        <div className="grid gap-2">
+                          {gameState.players
+                            .filter((p) => p.id !== voter.id)
+                            .map((candidate) => (
+                              <button
+                                key={candidate.id}
+                                className="bg-indigo-600 text-white py-1 px-3 rounded hover:bg-indigo-700 transition-colors"
+                                onClick={() =>
+                                  handleVoteForCaptain(voter.id, candidate.id)
+                                }
+                              >
+                                Voter pour {candidate.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    ) : hasVoted ? (
+                      <p className="text-green-600">
+                        A voté pour{" "}
+                        {
+                          gameState.players.find(
+                            (p) => p.id === votesForCaptain[voter.id]
+                          )?.name
                         }
-                        >
-                        Voter pour {candidate.name}
-                        </button>
-                        ))}
-                    </div>
-                  </div>) 
-                : hasVoted ? (
-                  <p className="text-green-600">
-                  A voté pour{" "}
-                  {
-                    gameState.players.find(
-                      (p) => p.id === votesForCaptain[voter.id]
-                    )?.name
-                  }
-                  </p>
-                ) : (
-                  <p className="text-gray-600">En attente de vote...</p>
-                )}
-              </div>
-              );
+                      </p>
+                    ) : (
+                      <p className="text-gray-600">En attente de vote...</p>
+                    )}
+                  </div>
+                );
               })}
             </div>
           </div>
@@ -546,23 +568,25 @@ export default function Game() {
       // Phase de révélation des rôles
       case "eyes-open":
         return (
-        <div className="max-w-4xl mx-auto p-4 text-center">
-          <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
-          <p className="mb-4">Regardez qui sont vos alliés...</p>
-          <p className="text-2xl font-bold mb-4">{timerShowROle} secondes restantes</p>
-          <button
-            onClick={handlePhaseChange}
-            className="bg-indigo-600 text-white py-2 px-4 rounded"
-          >
-            Ouvrer les yeux et commencer la partie
-          </button>
-        </div>
+          <div className="max-w-4xl mx-auto p-4 text-center">
+            <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
+            <p className="mb-4">Regardez qui sont vos alliés...</p>
+            <p className="text-2xl font-bold mb-4">
+              {timerShowROle} secondes restantes
+            </p>
+            <button
+              onClick={handlePhaseChange}
+              className="bg-indigo-600 text-white py-2 px-4 rounded"
+            >
+              Ouvrer les yeux et commencer la partie
+            </button>
+          </div>
         );
 
       // Phase de sélection de l'équipage
       case "crew-selection":
         return (
-            <div className="max-w-4xl mx-auto p-4">
+          <div className="max-w-4xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Sélection de l'équipage</h2>
             <p className="mb-4">
               Capitaine ({gameState.players[gameState.currentCaptain]?.name}),
@@ -570,29 +594,31 @@ export default function Game() {
             </p>
             <div className="grid grid-cols-2 gap-4">
               {gameState.players.map((player) => (
-                <div key={player.id}
+                <div
+                  key={player.id}
                   onClick={() => selectCrewMember(player.id)}
-                    className={`p-4 border rounded cursor-pointer ${
+                  className={`p-4 border rounded cursor-pointer ${
                     player.isInCrew ? "bg-indigo-100 border-indigo-500" : ""
-                    }`
-                  }
+                  }`}
                 >
                   <h3>{player.name}</h3>
                   {player.isInCrew && (
                     <span className="text-indigo-600">Sélectionné</span>
-                    )}
+                  )}
                 </div>
               ))}
             </div>
             {gameState.selectedCrew.length === 3 && (
               <button
-              onClick={() => { handleConfirmCrew() }}
-              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded"
+                onClick={() => {
+                  handleConfirmCrew();
+                }}
+                className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded"
               >
-              Confirmer l'équipage
+                Confirmer l'équipage
               </button>
             )}
-            </div>
+          </div>
         );
 
       // Phase de jeu
@@ -629,7 +655,9 @@ export default function Game() {
                       </div>
                     )}
                     {player?.selectedCard && <p>Carte jouée ✓</p>}
-                    {!isCurrentPlayer && !player?.selectedCard && <p>En attente...</p>}
+                    {!isCurrentPlayer && !player?.selectedCard && (
+                      <p>En attente...</p>
+                    )}
                   </div>
                 );
               })}
@@ -643,26 +671,26 @@ export default function Game() {
           <div className="max-w-4xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Révélation des cartes</h2>
             <div className="grid grid-cols-3 gap-4 mb-6">
-                {shuffleArray(gameState.selectedCrew).map((crewId) => {
+              {shuffleArray(gameState.selectedCrew).map((crewId) => {
                 // Récupérer le joueur correspondant à l'ID
                 const player = gameState.players.find((p) => p.id === crewId);
                 return (
                   <div key={crewId} className="p-4 border rounded text-center">
-                  <h3 className="font-bold">{player?.name}</h3>
-                  <p
-                    className={`mt-2 font-bold ${
-                    player?.selectedCard === "poison"
-                      ? "text-red-500"
-                      : "text-green-500"
-                    }`}
-                  >
-                    {player?.selectedCard === "poison"
-                    ? "☠️ Poison"
-                    : "🏝️ Île"}
-                  </p>
+                    <h3 className="font-bold">{player?.name}</h3>
+                    <p
+                      className={`mt-2 font-bold ${
+                        player?.selectedCard === "poison"
+                          ? "text-red-500"
+                          : "text-green-500"
+                      }`}
+                    >
+                      {player?.selectedCard === "poison"
+                        ? "☠️ Poison"
+                        : "🏝️ Île"}
+                    </p>
                   </div>
                 );
-                })}
+              })}
             </div>
             <div className="text-center">
               <p className="text-xl mb-4">
@@ -700,7 +728,8 @@ export default function Game() {
             </div>
 
             {/* Résultat si une des deux équpe a gagné */}
-            {gameState.score.pirates >= roundsForWin || gameState.score.marines >= roundsForWin ? (
+            {gameState.score.pirates >= roundsForWin ||
+            gameState.score.marines >= roundsForWin ? (
               <div className="text-center">
                 <h3 className="text-2xl font-bold mb-4">Fin de la partie !</h3>
                 {gameState.score.pirates >= roundsForWin ? (
@@ -720,28 +749,27 @@ export default function Game() {
                     </button>
                   </>
                 ) : (
-                <div className="mt-8">
-                  <button
-                    onClick={() => {
-                      initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
-                    }}
-                    className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    Recommencer avec les mêmes joueurs
-                  </button>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors ml-4"
-                  >
-                    Nouvelle partie
-                  </button>
-                </div>
-                
+                  <div className="mt-8">
+                    <button
+                      onClick={() => {
+                        initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
+                      }}
+                      className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      Recommencer avec les mêmes joueurs
+                    </button>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors ml-4"
+                    >
+                      Nouvelle partie
+                    </button>
+                  </div>
                 )}
               </div>
             ) : (
               <div className="text-center">
-              {/* Anonce du prochain capitaine */}
+                {/* Anonce du prochain capitaine */}
                 <p className="mb-4">
                   Le prochain capitaine sera :{" "}
                   {
@@ -778,51 +806,55 @@ export default function Game() {
             </p>
             <div className="grid grid-cols-2 gap-4">
               {piratesAndSiren.map((voter, index) => {
-              // Vérifier si le joueur a déjà voté
-              const hasVoted = votesForSiren[voter.id] !== undefined;
-              
-              // Vérifier si c'est le tour du joueur actuel
-              const isCurrentVoter = Object.keys(votesForSiren).length === index;
+                // Vérifier si le joueur a déjà voté
+                const hasVoted = votesForSiren[voter.id] !== undefined;
 
-              return (
-                <div key={voter.id} className="p-4 border rounded">
-                <h3 className="font-bold mb-2">{voter.name}</h3>
-                {!hasVoted && isCurrentVoter ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
-                      Votez pour éliminer un joueur :
-                    </p>
-                    <div className="grid gap-2">
-                      {gameState.players
-                      .filter((p) =>
-                        p.id !== voter.id &&
-                        (p.role === "pirate" || p.role === "sirene")
-                      )
-                      .map((suspect) => (
-                        <button key={suspect.id}
-                          className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition-colors"
-                          onClick={() =>
-                            handleSirenVote(voter.id, suspect.id)
-                          }
-                        >
-                        Voter contre {suspect.name}
-                        </button>
-                      ))}
-                    </div>
+                // Vérifier si c'est le tour du joueur actuel
+                const isCurrentVoter =
+                  Object.keys(votesForSiren).length === index;
+
+                return (
+                  <div key={voter.id} className="p-4 border rounded">
+                    <h3 className="font-bold mb-2">{voter.name}</h3>
+                    {!hasVoted && isCurrentVoter ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Votez pour éliminer un joueur :
+                        </p>
+                        <div className="grid gap-2">
+                          {gameState.players
+                            .filter(
+                              (p) =>
+                                p.id !== voter.id &&
+                                (p.role === "pirate" || p.role === "sirene")
+                            )
+                            .map((suspect) => (
+                              <button
+                                key={suspect.id}
+                                className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition-colors"
+                                onClick={() =>
+                                  handleSirenVote(voter.id, suspect.id)
+                                }
+                              >
+                                Voter contre {suspect.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    ) : hasVoted ? (
+                      <p className="text-green-600">
+                        A voté contre{" "}
+                        {
+                          gameState.players.find(
+                            (p) => p.id === votesForSiren[voter.id]
+                          )?.name
+                        }
+                      </p>
+                    ) : (
+                      <p className="text-gray-600">En attente de vote...</p>
+                    )}
                   </div>
-                ) : hasVoted ? (
-                  <p className="text-green-600">
-                    A voté contre{" "}
-                    {gameState.players.find(
-                      (p) => p.id === votesForSiren[voter.id]
-                      )?.name
-                    }
-                  </p>
-                ) : (
-                  <p className="text-gray-600">En attente de vote...</p>
-                )}
-                </div>
-              );
+                );
               })}
             </div>
           </div>
