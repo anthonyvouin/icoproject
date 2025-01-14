@@ -27,6 +27,7 @@ export default function Game() {
     winner: null,
   });
 
+  const [validPlayersNumber, setValidPlayersNumber] = useState<boolean>(false);
   const [playerCount, setPlayerCount] = useState<number>(7);
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [showingRole, setShowingRole] = useState<number | null>(null);
@@ -35,6 +36,14 @@ export default function Game() {
   }>({});
 
   const initializeGame = (numPlayers: number) => {
+    if (playerCount >= 7 && playerCount <= 20) {
+      const uniqueNames = new Set(playerNames.filter((name) => name.trim() !== ""));
+      
+      if (uniqueNames.size !== playerCount) {
+        alert("Tous les noms doivent être uniques et non vides.");
+        return;
+      }
+    }
     const roles = [];
     const distribution = getRoleDistribution(numPlayers);
 
@@ -229,32 +238,38 @@ export default function Game() {
                 Configuration de la partie
               </h2>
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2">
-                  Nombre de joueurs (7-20)
-                </label>
-                <select
-                  value={playerCount}
-                  onChange={(e) => {
-                    const count = Number(e.target.value);
-                    setPlayerCount(count);
-                    setPlayerNames(Array(count).fill(""));
-                  }}
-                  className="w-full p-2 border rounded mb-4"
-                >
-                  {Array.from({ length: 14 }, (_, i) => i + 7).map((num) => (
-                    <option key={num} value={num}>
-                      {num} joueurs
-                    </option>
-                  ))}
-                </select>
+                {/* Sélection du nombre de joeurs */}
+                {!validPlayersNumber && (
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">
+                    Nombre de joueurs (7-20)
+                  </label>
+                  <input type="range" min="7" max="20" value={playerCount} className="w-full mb-4"
+                    onChange={(e) => { 
+                      const count = Number(e.target.value); setPlayerCount(count);
+                      setPlayerNames(Array(count).fill(""));
+                    }}
+                  />
+                  <div className="text-center text-gray-700 mb-4">
+                    {playerCount} joueurs
+                  </div>    
 
+                  <button
+                    onClick={() => setValidPlayersNumber(true)}
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+                  >
+                    Valider le nombre de joueurs
+                  </button>
+                </div>
+                )}
+
+                {/* Saisie des noms des joueurs */}
+                {validPlayersNumber && (
                 <div className="space-y-3">
                   {Array.from({ length: playerCount }, (_, index) => (
                     <div key={index} className="flex items-center">
                       <label className="w-24">Joueur {index + 1}:</label>
-                      <input
-                        type="text"
-                        value={playerNames[index] || ""}
+                      <input type="text" value={playerNames[index] || ""}
                         onChange={(e) => {
                           const newNames = [...playerNames];
                           newNames[index] = e.target.value;
@@ -265,14 +280,16 @@ export default function Game() {
                       />
                     </div>
                   ))}
+
+                  <button
+                    onClick={() => initializeGame(playerCount)}
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+                  >
+                    Commencer la partie
+                  </button>
                 </div>
+                )}
               </div>
-              <button
-                onClick={() => initializeGame(playerCount)}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
-              >
-                Commencer la partie
-              </button>
             </div>
           </div>
         );
