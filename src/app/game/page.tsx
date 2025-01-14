@@ -32,7 +32,7 @@ export default function Game() {
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [showingRole, setShowingRole] = useState<number | null>(null);
   const timerForRoleRevel = 10; // Timer pour la révélation des rôles
-  const roundsForWin = 4; // Nombre de manches pour gagner
+  const roundsForWin = 2; // Nombre de manches pour gagner
   const [timerShowROle, setTimerShowROle] = useState(timerForRoleRevel);
   const [votesForCaptain, setVotesForCaptain] = useState<{
     [key: number]: number;
@@ -42,6 +42,13 @@ export default function Game() {
   );
 
   const initializeGame = (numPlayers: number, keepPlayers: boolean) => {
+    // Vérification des noms des joueurs
+    const uniqueNames = new Set(playerNames.filter(name => name.trim() !== ""));
+    if (uniqueNames.size !== numPlayers) {
+      alert("Veuillez entrer un nom unique pour chaque joueur.");
+      return;
+    }
+
     const roles = [];
     const distribution = getRoleDistribution(numPlayers);
   
