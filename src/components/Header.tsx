@@ -23,7 +23,13 @@ export default function Header() {
               className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
               Contact
-            </Link> 
+            </Link>
+            <Link
+              href="/rules"
+              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Règles du jeu
+            </Link>
             <Link
               href="/game"
               className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"

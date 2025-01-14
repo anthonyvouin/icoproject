@@ -34,9 +34,9 @@ export default function AdminDashboard() {
 
     try {
       const response = await fetch(`/api/admin/users?userId=${userId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -46,19 +46,22 @@ export default function AdminDashboard() {
       }
 
       // Mise à jour de l'interface après suppression réussie
-      setUsers(users.filter(user => user.id !== userId));
-      setStats(prev => ({
+      setUsers(users.filter((user) => user.id !== userId));
+      setStats((prev) => ({
         ...prev,
         totalUsers: prev.totalUsers - 1,
-        adminCount: users.find(u => u.id === userId)?.role === "ADMIN" 
-          ? prev.adminCount - 1 
-          : prev.adminCount
+        adminCount:
+          users.find((u) => u.id === userId)?.role === "ADMIN"
+            ? prev.adminCount - 1
+            : prev.adminCount,
       }));
 
       alert("Utilisateur supprimé avec succès");
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
-      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
+      alert(
+        error instanceof Error ? error.message : "Erreur lors de la suppression"
+      );
     }
   };
 
@@ -69,12 +72,16 @@ export default function AdminDashboard() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || "Erreur lors du chargement des utilisateurs");
+          throw new Error(
+            data.error || "Erreur lors du chargement des utilisateurs"
+          );
         }
 
         setUsers(data);
 
-        const adminCount = data.filter((user: User) => user.role === "ADMIN").length;
+        const adminCount = data.filter(
+          (user: User) => user.role === "ADMIN"
+        ).length;
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const recentUsers = data.filter(
@@ -87,7 +94,9 @@ export default function AdminDashboard() {
           recentUsers,
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Une erreur est survenue");
+        setError(
+          err instanceof Error ? err.message : "Une erreur est survenue"
+        );
       } finally {
         setLoading(false);
       }
@@ -128,7 +137,7 @@ export default function AdminDashboard() {
                 Dashboard Administrateur
               </h2>
             </div>
-            <div className="mt-4 flex md:mt-0 md:ml-4">
+            <div className="mt-4 flex md:mt-0 md:ml-4 space-x-4">
               <a
                 href="/admin/contacts"
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -147,6 +156,25 @@ export default function AdminDashboard() {
                   />
                 </svg>
                 Voir les demandes de contact
+              </a>
+              <a
+                href="/admin/rules"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg
+                  className="mr-2 -ml-1 h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                Gestion des règles
               </a>
             </div>
           </div>
