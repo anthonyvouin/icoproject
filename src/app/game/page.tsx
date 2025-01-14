@@ -33,6 +33,9 @@ export default function Game() {
   const [votesForCaptain, setVotesForCaptain] = useState<{
     [key: number]: number;
   }>({});
+  const [votesForSiren, setVotesForSiren] = useState<{ [key: number]: number }>(
+    {}
+  );
 
   const initializeGame = (numPlayers: number) => {
     const roles = [];
@@ -96,6 +99,45 @@ export default function Game() {
           ...prev,
           phase: "distribution",
           currentCaptain: captainId,
+        }));
+      }
+
+      return newVotes;
+    });
+  };
+
+  const handleSirenVote = (voterId: number, targetId: number) => {
+    setVotesForSiren((prev) => {
+      const newVotes = { ...prev };
+      newVotes[voterId] = targetId;
+
+      // Si tous les pirates ET la sirène ont voté
+      const piratesAndSiren = gameState.players.filter(
+        (p) => p.role === "pirate" || p.role === "sirene"
+      );
+      if (Object.keys(newVotes).length === piratesAndSiren.length) {
+        // Compter les votes
+        const voteCounts: { [key: number]: number } = {};
+        Object.values(newVotes).forEach((vote) => {
+          voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+        });
+
+        // Trouver le joueur le plus voté
+        let maxVotes = 0;
+        let accusedId = 0;
+        Object.entries(voteCounts).forEach(([playerId, votes]) => {
+          if (votes > maxVotes) {
+            maxVotes = votes;
+            accusedId = parseInt(playerId);
+          }
+        });
+
+        // Vérifier si c'est la sirène
+        const accusedPlayer = gameState.players.find((p) => p.id === accusedId);
+        setGameState((prev) => ({
+          ...prev,
+          phase: "game-over",
+          winner: accusedPlayer?.role === "sirene" ? "pirates" : "sirene",
         }));
       }
 
@@ -178,26 +220,42 @@ export default function Game() {
 
   // Fonction pour évaluer la manche
   const evaluateRound = () => {
-    // Vérifier les cartes jouées
     const poisonPlayed = gameState.playedCards.some(
       (card) => card === "poison"
     );
     const newScore = { ...gameState.score };
 
     if (poisonPlayed) {
-      // Si au moins un poison a été joué, les pirates gagnent la manche
       newScore.pirates += 1;
     } else {
-      // Si que des îles ont été jouées, les marines gagnent la manche
       newScore.marines += 1;
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      phase: "result",
-      score: newScore,
-      currentRound: prev.currentRound + 1,
-    }));
+    if (newScore.pirates >= 10) {
+      // Les pirates gagnent la manche, ils doivent maintenant trouver la sirène
+      setGameState((prev) => ({
+        ...prev,
+        phase: "final-vote",
+        score: newScore,
+      }));
+      setVotesForSiren({});
+    } else if (newScore.marines >= 10) {
+      // Les marines gagnent directement
+      setGameState((prev) => ({
+        ...prev,
+        phase: "game-over",
+        score: newScore,
+        winner: "marines",
+      }));
+    } else {
+      // La partie continue
+      setGameState((prev) => ({
+        ...prev,
+        phase: "result",
+        score: newScore,
+        currentRound: prev.currentRound + 1,
+      }));
+    }
   };
 
   // Fonction pour passer au tour suivant
@@ -446,16 +504,18 @@ export default function Game() {
                       <div className="mt-2 space-x-2">
                         <button
                           onClick={() => playCard(crewId, "ile")}
-                          className="bg-green-500 text-white py-1 px-3 rounded"
+                          className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition-colors"
                         >
                           Jouer Île
                         </button>
-                        <button
-                          onClick={() => playCard(crewId, "poison")}
-                          className="bg-red-500 text-white py-1 px-3 rounded"
-                        >
-                          Jouer Poison
-                        </button>
+                        {player?.role === "pirate" && (
+                          <button
+                            onClick={() => playCard(crewId, "poison")}
+                            className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors"
+                          >
+                            Jouer Poison
+                          </button>
+                        )}
                       </div>
                     )}
                     {player?.selectedCard && <p>Carte jouée ✓</p>}
@@ -578,6 +638,109 @@ export default function Game() {
                 </button>
               </div>
             )}
+          </div>
+        );
+
+      case "final-vote":
+        const piratesAndSiren = gameState.players.filter(
+          (p) => p.role === "pirate" || p.role === "sirene"
+        );
+        return (
+          <div className="max-w-4xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">
+              Vote Final - Trouver la Sirène
+            </h2>
+            <p className="text-lg mb-6">
+              Pirates et Sirène, vous devez voter pour éliminer un joueur !
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              {piratesAndSiren.map((voter) => {
+                const hasVoted = votesForSiren[voter.id] !== undefined;
+                return (
+                  <div key={voter.id} className="p-4 border rounded">
+                    <h3 className="font-bold mb-2">{voter.name}</h3>
+                    {!hasVoted ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Votez pour éliminer un joueur :
+                        </p>
+                        <div className="grid gap-2">
+                          {gameState.players
+                            .filter(
+                              (p) =>
+                                p.id !== voter.id &&
+                                (p.role === "pirate" || p.role === "sirene")
+                            )
+                            .map((suspect) => (
+                              <button
+                                key={suspect.id}
+                                onClick={() =>
+                                  handleSirenVote(voter.id, suspect.id)
+                                }
+                                className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition-colors"
+                              >
+                                Voter contre {suspect.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-green-600">
+                        A voté contre{" "}
+                        {
+                          gameState.players.find(
+                            (p) => p.id === votesForSiren[voter.id]
+                          )?.name
+                        }
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+
+      case "game-over":
+        return (
+          <div className="max-w-4xl mx-auto p-4 text-center">
+            <h2 className="text-3xl font-bold mb-6">Fin de la partie !</h2>
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              {gameState.winner === "pirates" && (
+                <>
+                  <h3 className="text-2xl text-red-600 font-bold mb-4">
+                    Les Pirates ont gagné !
+                  </h3>
+                  <p className="text-lg mb-4">Ils ont trouvé la Sirène !</p>
+                </>
+              )}
+              {gameState.winner === "marines" && (
+                <>
+                  <h3 className="text-2xl text-blue-600 font-bold mb-4">
+                    Les Marines ont gagné !
+                  </h3>
+                  <p className="text-lg mb-4">L'ordre est maintenu !</p>
+                </>
+              )}
+              {gameState.winner === "sirene" && (
+                <>
+                  <h3 className="text-2xl text-purple-600 font-bold mb-4">
+                    La Sirène a gagné !
+                  </h3>
+                  <p className="text-lg mb-4">
+                    Les pirates n'ont pas réussi à la trouver !
+                  </p>
+                </>
+              )}
+              <div className="mt-8">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Nouvelle partie
+                </button>
+              </div>
+            </div>
           </div>
         );
 

@@ -10,7 +10,8 @@ export type GamePhase =
   | "reveal-cards"
   | "vote"
   | "result"
-  | "final-vote";
+  | "final-vote"
+  | "game-over";
 
 export type BonusCard =
   | "mal-de-mer"
