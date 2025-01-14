@@ -30,6 +30,9 @@ export default function Game() {
   const [playerCount, setPlayerCount] = useState<number>(7);
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [showingRole, setShowingRole] = useState<number | null>(null);
+  const [votesForCaptain, setVotesForCaptain] = useState<{
+    [key: number]: number;
+  }>({});
 
   const initializeGame = (numPlayers: number) => {
     const roles = [];
@@ -56,11 +59,47 @@ export default function Game() {
 
     setGameState({
       ...gameState,
-      phase: "distribution",
+      phase: "captain-vote",
       players: players as Player[],
-      currentCaptain: Math.floor(Math.random() * numPlayers),
       bonusCardsDeck: bonusCards,
       actionCardsDeck: createActionDeck(),
+    });
+
+    setVotesForCaptain({});
+  };
+
+  const handleVoteForCaptain = (voterId: number, targetId: number) => {
+    setVotesForCaptain((prev) => {
+      const newVotes = { ...prev };
+      newVotes[voterId] = targetId;
+
+      // Si tout le monde a voté, on détermine le capitaine
+      if (Object.keys(newVotes).length === gameState.players.length) {
+        // Compter les votes
+        const voteCounts: { [key: number]: number } = {};
+        Object.values(newVotes).forEach((vote) => {
+          voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+        });
+
+        // Trouver le joueur avec le plus de votes
+        let maxVotes = 0;
+        let captainId = 0;
+        Object.entries(voteCounts).forEach(([playerId, votes]) => {
+          if (votes > maxVotes) {
+            maxVotes = votes;
+            captainId = parseInt(playerId);
+          }
+        });
+
+        // Passer à la phase suivante avec le nouveau capitaine
+        setGameState((prev) => ({
+          ...prev,
+          phase: "distribution",
+          currentCaptain: captainId,
+        }));
+      }
+
+      return newVotes;
     });
   };
 
@@ -234,6 +273,54 @@ export default function Game() {
               >
                 Commencer la partie
               </button>
+            </div>
+          </div>
+        );
+
+      case "captain-vote":
+        return (
+          <div className="max-w-4xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">Élection du Capitaine</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {gameState.players.map((voter) => {
+                const hasVoted = votesForCaptain[voter.id] !== undefined;
+                return (
+                  <div key={voter.id} className="p-4 border rounded">
+                    <h3 className="font-bold mb-2">{voter.name}</h3>
+                    {!hasVoted ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Votez pour un capitaine :
+                        </p>
+                        <div className="grid gap-2">
+                          {gameState.players
+                            .filter((p) => p.id !== voter.id)
+                            .map((candidate) => (
+                              <button
+                                key={candidate.id}
+                                onClick={() =>
+                                  handleVoteForCaptain(voter.id, candidate.id)
+                                }
+                                className="bg-indigo-600 text-white py-1 px-3 rounded hover:bg-indigo-700 transition-colors"
+                              >
+                                Voter pour {candidate.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-green-600">
+                        A voté pour{" "}
+                        {
+                          gameState.players.find(
+                            (p) => p.id === votesForCaptain[voter.id]
+                          )?.name
+                        }
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );

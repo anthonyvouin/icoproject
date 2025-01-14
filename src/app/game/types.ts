@@ -1,6 +1,7 @@
 export type Role = "pirate" | "marin" | "sirene" | null;
 export type GamePhase =
   | "setup"
+  | "captain-vote"
   | "distribution"
   | "eyes-closed"
   | "eyes-open"
