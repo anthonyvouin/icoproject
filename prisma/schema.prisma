@@ -49,5 +49,6 @@ model Rule {
 model GameSettings {
   id          Int      @id @default(autoincrement())
   roundsToWin Int      @default(10)
+  timer       Int      @default(10)
   updatedAt   DateTime @updatedAt
 }

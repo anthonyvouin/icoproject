@@ -31,8 +31,9 @@ export default function Game() {
   const [playerCount, setPlayerCount] = useState<number>(7);
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [showingRole, setShowingRole] = useState<number | null>(null);
-  const timerForRoleRevel = 10; // Timer pour la révélation des rôles
-  const [roundsForWin, setRoundsForWin] = useState(2); // Initialisation avec la valeur par défaut
+  const [timerForRoleRevel, setTimerForRoleRevel] = useState(10);
+  const [roundsForWin, setRoundsForWin] = useState(2);
+
   const [timerShowROle, setTimerShowROle] = useState(timerForRoleRevel);
   const [votesForCaptain, setVotesForCaptain] = useState<{
     [key: number]: number;
@@ -55,6 +56,22 @@ export default function Game() {
     };
 
     fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    const fetchTimer = async () => {
+      try {
+        const response = await fetch("/api/admin/timer");
+        const data = await response.json();
+        if (data.timer) {
+          setTimerForRoleRevel(data.timer);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération du timer:", error);
+      }
+    };
+
+    fetchTimer();
   }, []);
 
   const initializeGame = (numPlayers: number, keepPlayers: boolean) => {
