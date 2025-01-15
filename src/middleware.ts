@@ -83,5 +83,6 @@ export const config = {
     "/admin/:path*",
     "/api/admin/:path*",
     "/game",
+    "/api/game/:path*",
   ],
 };

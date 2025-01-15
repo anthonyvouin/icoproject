@@ -129,61 +129,72 @@ export default function Game() {
       const response = await fetch("/api/game/start", {
         method: "POST",
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || "Erreur lors de la création de la partie"
+        );
+      }
+
       const gameData = await response.json();
       setGameId(gameData.id);
-    } catch (error) {
-      console.error("Erreur lors de la création de la partie:", error);
-    }
 
-    const roles = [];
-    const distribution = getRoleDistribution(numPlayers);
+      const roles = [];
+      const distribution = getRoleDistribution(numPlayers);
 
-    for (let i = 0; i < distribution.pirates; i++) roles.push("pirate" as Role);
-    for (let i = 0; i < distribution.marins; i++) roles.push("marin" as Role);
-    roles.push("sirene" as Role);
+      for (let i = 0; i < distribution.pirates; i++)
+        roles.push("pirate" as Role);
+      for (let i = 0; i < distribution.marins; i++) roles.push("marin" as Role);
+      roles.push("sirene" as Role);
 
-    const shuffledRoles = shuffleArray(roles);
-    const bonusCards = createBonusDeck();
+      const shuffledRoles = shuffleArray(roles);
+      const bonusCards = createBonusDeck();
 
-    const players = keepPlayers
-      ? gameState.players.map((player, index) => ({
-          ...player,
-          role: shuffledRoles[index] as Role,
-          bonusCard: drawBonusCard(bonusCards) as BonusCard,
-          hasVoted: false,
-          isInCrew: false,
-          selectedCard: null,
-        }))
-      : Array(numPlayers)
-          .fill(null)
-          .map((_, index) => ({
-            id: index,
-            name: playerNames[index] || `Joueur ${index + 1}`,
+      const players = keepPlayers
+        ? gameState.players.map((player, index) => ({
+            ...player,
             role: shuffledRoles[index] as Role,
             bonusCard: drawBonusCard(bonusCards) as BonusCard,
             hasVoted: false,
             isInCrew: false,
             selectedCard: null,
-          }));
+          }))
+        : Array(numPlayers)
+            .fill(null)
+            .map((_, index) => ({
+              id: index,
+              name: playerNames[index] || `Joueur ${index + 1}`,
+              role: shuffledRoles[index] as Role,
+              bonusCard: drawBonusCard(bonusCards) as BonusCard,
+              hasVoted: false,
+              isInCrew: false,
+              selectedCard: null,
+            }));
 
-    setGameState({
-      phase: "captain-vote",
-      players,
-      currentCaptain: 0,
-      currentRound: 0,
-      selectedCrew: [],
-      playedCards: [],
-      score: {
-        pirates: 0,
-        marines: 0,
-      },
-      bonusCardsDeck: bonusCards,
-      actionCardsDeck: createActionDeck(),
-      winner: null,
-    });
+      setGameState({
+        phase: "captain-vote",
+        players,
+        currentCaptain: 0,
+        currentRound: 0,
+        selectedCrew: [],
+        playedCards: [],
+        score: {
+          pirates: 0,
+          marines: 0,
+        },
+        bonusCardsDeck: bonusCards,
+        actionCardsDeck: createActionDeck(),
+        winner: null,
+      });
 
-    setVotesForCaptain({});
-    setVotesForSiren({});
+      setVotesForCaptain({});
+      setVotesForSiren({});
+    } catch (error) {
+      console.error("Erreur lors de la création de la partie:", error);
+      alert("Erreur lors de la création de la partie. Veuillez réessayer.");
+      return;
+    }
   };
 
   const handleVoteForCaptain = (voterId: number, targetId: number) => {
@@ -985,24 +996,27 @@ export default function Game() {
   };
 
   useEffect(() => {
-    // Si on a un gagnant et un ID de partie, on termine la partie dans la base de données
-    if (gameState.winner && gameId) {
-      const endGame = async () => {
+    const endGame = async () => {
+      if (gameState.winner && gameId) {
         try {
-          await fetch("/api/game/end", {
+          const response = await fetch("/api/game/end", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ gameId }),
           });
+
+          if (!response.ok) {
+            throw new Error("Erreur lors de la fin de la partie");
+          }
         } catch (error) {
           console.error("Erreur lors de la fin de la partie:", error);
         }
-      };
+      }
+    };
 
-      endGame();
-    }
+    endGame();
   }, [gameState.winner, gameId]);
 
   return <div className="min-h-screen bg-gray-100">{renderPhase()}</div>;

@@ -57,6 +57,7 @@ model Game {
   id        Int       @id @default(autoincrement())
   startDate DateTime  @default(now())
   endDate   DateTime?
+  user_id   Int
 }
 
 enum CardType {
