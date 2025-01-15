@@ -52,3 +52,24 @@ model GameSettings {
   timer       Int      @default(10)
   updatedAt   DateTime @updatedAt
 }
+
+model Game {
+  id        Int       @id @default(autoincrement())
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+}
+
+enum CardType {
+  ROLE
+  BONUS
+  ACTION
+}
+
+model Card {
+  id          Int      @id @default(autoincrement())
+  nom         String
+  description String   @db.Text
+  type        CardType
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
