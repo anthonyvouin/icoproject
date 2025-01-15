@@ -253,17 +253,6 @@ export default function Game() {
     }
   };
 
-  // Timer pour la phase de révélation des rôles
-  useEffect(() => {
-    if (timerShowROle > 0) {
-      const timer = setTimeout(() => {
-        setTimerShowROle(timerShowROle - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      handlePhaseChange();
-    }
-  }, [timerShowROle]);
 
   // Confirmation de l'équipage
   const handleConfirmCrew = () => {
