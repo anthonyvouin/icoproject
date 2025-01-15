@@ -15,6 +15,7 @@ interface Stats {
   totalUsers: number;
   adminCount: number;
   recentUsers: number;
+  finishedGames: number;
 }
 
 export default function AdminDashboard() {
@@ -23,6 +24,7 @@ export default function AdminDashboard() {
     totalUsers: 0,
     adminCount: 0,
     recentUsers: 0,
+    finishedGames: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -67,32 +69,44 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/admin/users");
-        const data = await response.json();
+        // Récupération des utilisateurs
+        const usersResponse = await fetch("/api/admin/users");
+        const usersData = await usersResponse.json();
 
-        if (!response.ok) {
+        if (!usersResponse.ok) {
           throw new Error(
-            data.error || "Erreur lors du chargement des utilisateurs"
+            usersData.error || "Erreur lors du chargement des utilisateurs"
           );
         }
 
-        setUsers(data);
+        setUsers(usersData);
 
-        const adminCount = data.filter(
+        // Récupération du nombre de parties terminées
+        const gamesResponse = await fetch("/api/admin/game");
+        const gamesData = await gamesResponse.json();
+
+        if (!gamesResponse.ok) {
+          throw new Error(
+            gamesData.error || "Erreur lors du chargement des parties"
+          );
+        }
+
+        const adminCount = usersData.filter(
           (user: User) => user.role === "ADMIN"
         ).length;
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        const recentUsers = data.filter(
+        const recentUsers = usersData.filter(
           (user: User) => new Date(user.createdAt) > oneWeekAgo
         ).length;
 
         setStats({
-          totalUsers: data.length,
+          totalUsers: usersData.length,
           adminCount,
           recentUsers,
+          finishedGames: gamesData.count,
         });
       } catch (err) {
         setError(
@@ -103,7 +117,7 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -224,7 +238,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
             <div className="bg-white/80 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -314,6 +328,38 @@ export default function AdminDashboard() {
                       </dt>
                       <dd className="text-3xl font-semibold text-gray-900">
                         {stats.recentUsers}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                    <svg
+                      className="h-6 w-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Parties terminées
+                      </dt>
+                      <dd className="text-3xl font-semibold text-gray-900">
+                        {stats.finishedGames}
                       </dd>
                     </dl>
                   </div>

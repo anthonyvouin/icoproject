@@ -49,3 +49,24 @@ export async function PUT(request: Request) {
     );
   }
 }
+
+// Compter les parties terminées
+export async function GET() {
+  try {
+    const finishedGamesCount = await prisma.game.count({
+      where: {
+        endDate: {
+          not: null,
+        },
+      },
+    });
+
+    return NextResponse.json({ count: finishedGamesCount });
+  } catch (error) {
+    console.error("Erreur lors du comptage des parties:", error);
+    return NextResponse.json(
+      { error: "Erreur lors du comptage des parties" },
+      { status: 500 }
+    );
+  }
+}
