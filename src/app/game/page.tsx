@@ -27,6 +27,7 @@ export default function Game() {
     winner: null,
   });
 
+  const [gameId, setGameId] = useState<number | null>(null);
   const [validPlayersNumber, setValidPlayersNumber] = useState<boolean>(false);
   const [playerCount, setPlayerCount] = useState<number>(7);
   const [playerNames, setPlayerNames] = useState<string[]>([]);
@@ -110,7 +111,7 @@ export default function Game() {
   // Ne pas afficher le timer tant qu'il n'est pas chargé
   const displayTimer = isTimerLoading ? null : timerForRoleRevel;
 
-  const initializeGame = (numPlayers: number, keepPlayers: boolean) => {
+  const initializeGame = async (numPlayers: number, keepPlayers: boolean) => {
     // Vérification des noms des joueurs
     const uniqueNames = new Set(
       playerNames.filter((name) => name.trim() !== "")
@@ -118,6 +119,17 @@ export default function Game() {
     if (uniqueNames.size !== numPlayers) {
       alert("Veuillez entrer un nom unique pour chaque joueur.");
       return;
+    }
+
+    try {
+      // Créer une nouvelle partie dans la base de données
+      const response = await fetch("/api/game/start", {
+        method: "POST",
+      });
+      const gameData = await response.json();
+      setGameId(gameData.id);
+    } catch (error) {
+      console.error("Erreur lors de la création de la partie:", error);
     }
 
     const roles = [];
@@ -968,6 +980,27 @@ export default function Game() {
         return null;
     }
   };
+
+  useEffect(() => {
+    // Si on a un gagnant et un ID de partie, on termine la partie dans la base de données
+    if (gameState.winner && gameId) {
+      const endGame = async () => {
+        try {
+          await fetch("/api/game/end", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ gameId }),
+          });
+        } catch (error) {
+          console.error("Erreur lors de la fin de la partie:", error);
+        }
+      };
+
+      endGame();
+    }
+  }, [gameState.winner, gameId]);
 
   return <div className="min-h-screen bg-gray-100">{renderPhase()}</div>;
 }
