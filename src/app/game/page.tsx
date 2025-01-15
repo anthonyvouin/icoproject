@@ -97,6 +97,7 @@ export default function Game() {
         setTimerShowROle((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
+            handlePhaseChange();
             return 0;
           }
           return prev - 1;
@@ -252,7 +253,6 @@ export default function Game() {
       }
     }
   };
-
 
   // Confirmation de l'équipage
   const handleConfirmCrew = () => {
