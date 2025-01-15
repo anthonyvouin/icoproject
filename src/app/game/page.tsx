@@ -9,8 +9,11 @@ import {
   createActionDeck,
   drawBonusCard,
 } from "./utils";
+import { useRouter } from "next/navigation";
 
 export default function Game() {
+  const router = useRouter();
+
   const [gameState, setGameState] = useState<GameState>({
     phase: "setup",
     players: [],
