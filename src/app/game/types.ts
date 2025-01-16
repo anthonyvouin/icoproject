@@ -1,4 +1,6 @@
 export type Role = "pirate" | "marin" | "sirene" | null;
+export type ActionCard = "ile" | "poison" | null;
+
 export type GamePhase =
   | "setup"
   | "captain-vote"
@@ -13,39 +15,14 @@ export type GamePhase =
   | "final-vote"
   | "game-over";
 
-export type BonusCard =
-  | "mal-de-mer"
-  | "mer-agitee"
-  | "antidote"
-  | "observateur"
-  | "tribord"
-  | "par-dessus-bord"
-  | "carte-tresor"
-  | "malandrin"
-  | "voyage-express"
-  | "amarrage"
-  | "chanceux"
-  | "perroquet"
-  | "charlatan"
-  | "double"
-  | "leviathan"
-  | "meduse"
-  | "troc"
-  | "marchand"
-  | "solitaire"
-  | "typhon"
-  | null;
-
-export type ActionCard = "ile" | "poison" | null;
-
 export interface Player {
   id: number;
   name: string;
   role: Role;
-  bonusCard: BonusCard;
+  bonusCard: Card;
   hasVoted: boolean;
   isInCrew: boolean;
-  selectedCard: ActionCard;
+  selectedCard: "ile" | "poison" | null;
 }
 
 export interface GameState {
@@ -59,7 +36,22 @@ export interface GameState {
     pirates: number;
     marines: number;
   };
-  bonusCardsDeck: BonusCard[];
-  actionCardsDeck: ActionCard[];
+  bonusCardsDeck: Card[];
+  actionCardsDeck: Card[];
   winner: "pirates" | "marines" | "sirene" | null;
+}
+
+export enum CardType {
+  ROLE = "ROLE",
+  BONUS = "BONUS",
+  ACTION = "ACTION"
+}
+
+export interface Card {
+  id: number;
+  nom: string;
+  description: string;
+  type: CardType;
+  createdAt: Date;
+  updatedAt: Date;
 }
