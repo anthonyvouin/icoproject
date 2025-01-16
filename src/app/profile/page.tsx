@@ -10,33 +10,54 @@ interface UserProfile {
   updatedAt: string;
 }
 
+interface Game {
+  id: number;
+  startDate: string;
+  endDate: string;
+  user_id: number;
+}
+
 export default function ProfilePage() {
+  const [parties, setParties] = useState<Game[]>([]);
+  const [partiesNigth, setPartiesNigth] = useState<Game[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/profile");
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Erreur lors du chargement du profil");
+        const [profileResponse, gamesResponse] = await Promise.all([
+          fetch("/api/profile"),
+          fetch("/api/game"),
+        ]);
+  
+        const profileData = await profileResponse.json();
+        const gamesData = await gamesResponse.json();
+  
+        if (!profileResponse.ok || !gamesResponse.ok) {
+          throw new Error("Erreur lors du chargement des données");
         }
-
-        setProfile(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Une erreur est survenue"
+  
+        setProfile(profileData);
+        const playerGames = gamesData.filter(
+          (game: Game) => game.user_id == profileData.id
         );
+        setParties(playerGames);
+
+        const playerGamesNigth = gamesData.filter(
+          (game: Game) => game.user_id == profileData.id && game.startDate > "22:00"
+        );
+        setPartiesNigth(playerGamesNigth);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Une erreur est survenue");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProfile();
-  }, []);
+  
+    fetchData();
+  }, []);  
 
   if (loading) {
     return (
@@ -138,6 +159,32 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            <div className="mt-8">
+              <h1 className="text-lg font-semibold">Vos badges</h1>
+              <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {parties.length > 0 ? (
+                <div className="bg-green-500 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-sm font-medium text-white">Le roi des partie</h3>
+                </div>
+                ) : ( 
+                  <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <h3 className="text-sm font-medium text-gray-500">Le roi des partie</h3>
+                  </div>
+                )
+                }
+
+                {partiesNigth.length > 0 ? (
+                <div className="bg-green-500 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-sm font-medium text-white">Couche Tard</h3>
+                </div>
+                ) : ( 
+                  <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <h3 className="text-sm font-medium text-gray-500">Couche Tard</h3>
+                  </div>
+                )
+                }
+              </div>
+            </div>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Modifier le profil

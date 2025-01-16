@@ -204,7 +204,7 @@ export default function Game() {
         ? gameState.players.map((player, index) => ({
             ...player,
             role: shuffledRoles[index] as Role,
-            bonusCard: drawBonusCard(bonusCards) as unknown as Card,
+            bonusCard: drawBonusCard(bonusCards as Card[]) || { id: 0, nom: '', description: '', type: 'BONUS' as CardType, image: '', createdAt: new Date(), updatedAt: new Date() },
             hasVoted: false,
             isInCrew: false,
             selectedCard: null,
@@ -215,7 +215,7 @@ export default function Game() {
               id: index,
               name: playerNames[index] || `Joueur ${index + 1}`,
               role: shuffledRoles[index] as Role,
-              bonusCard: drawBonusCard(bonusCards) as unknown as Card,
+              bonusCard: drawBonusCard(bonusCards as Card[]) || { id: 0, nom: '', description: '', type: 'BONUS' as CardType, image: '', createdAt: new Date(), updatedAt: new Date() },
               hasVoted: false,
               isInCrew: false,
               selectedCard: null,
@@ -232,7 +232,7 @@ export default function Game() {
           pirates: 0,
           marines: 0,
         },
-        bonusCardsDeck: bonusCards,
+        bonusCardsDeck: bonusCards as Card[],
         actionCardsDeck: createActionDeck(),
         winner: null,
       });
@@ -665,7 +665,7 @@ export default function Game() {
                       Voir mon rôle
                     </button>
 
-                    {player.bonusCard && (
+                    {player.bonusCard.nom && (
                       <button onClick={() => handleShowPopin(player.id, 'bonus')}
                         className="text-emerald-600"
                       >
@@ -797,18 +797,16 @@ export default function Game() {
                   <div key={crewId} className="p-4 border rounded">
                     <h3 className="font-bold">{player?.name}</h3>
                     {isCurrentPlayer && !player?.selectedCard && (
-                      <div className="mt-2 space-x-2">
+                      <div className="mt-2 space-x-4 text-center">
                         <button
                           onClick={() => playCard(crewId, "ile")}
-                          className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition-colors"
                         >
                           <CardAction nom={"ile"}  />
                         </button>
                         <button
                           onClick={() => playCard(crewId, "poison")}
-                          className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors"
                         >
-                          <CardAction nom={"poisson"}  />
+                          <CardAction nom={"poison"}  />
                         </button>
                       </div>
                     )}

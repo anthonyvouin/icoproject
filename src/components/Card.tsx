@@ -23,7 +23,7 @@ export const CardPopin: React.FC<CardProps> = ({ nom, onClose }) => {
           return c.nom.toLowerCase() === nom.toLowerCase();
         });
   
-        setCard(roleCards || null); // Gérer le cas où aucune carte n'est trouvée
+        setCard(roleCards);
       } catch (error) {
         console.error("Erreur lors de la récupération des cartes :", error);
       }
@@ -48,7 +48,7 @@ export const CardPopin: React.FC<CardProps> = ({ nom, onClose }) => {
 
                 <div className="flex items-center justify-center">
                     <img className="rounded-full" alt={"image-" + card.nom} 
-                        src="https://fastly.picsum.photos/id/129/200/200.jpg?hmac=Y7ERTUfFi4RdOFkUcoOnX_xjWnsy4PA7pJkkFmaQt8c" 
+                        src={card.image} 
                     />
                 </div>
                 <div className="py-5">
@@ -79,15 +79,26 @@ export const CardAction: React.FC<CardActionProps> = ({ nom }) => {
 
  const [card, setCard] = useState<Card | null>(null);
 
-  useEffect(() => {
+ useEffect(() => {
     const getRolesCard = async () => {
-      const response = await fetch('/api/admin/cards');
-      const cards = await response.json();
-      const roleCards = cards.find((c: Card) => c.nom = nom );
-      setCard(roleCards);
+      try {
+        const response = await fetch('/api/admin/cards');
+        if (!response.ok) {
+          throw new Error(`Erreur lors de la récupération des cartes : ${response.status}`);
+        }
+        const cards = await response.json();
+  
+        const roleCards = cards.find((c: Card) => {
+          return c.nom.toLowerCase() === nom.toLowerCase();
+        });
+  
+        setCard(roleCards);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des cartes :", error);
+      }
     };
+  
     getRolesCard();
-
   }, [nom]);
 
   return (
@@ -96,11 +107,11 @@ export const CardAction: React.FC<CardActionProps> = ({ nom }) => {
     <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow">
         <div className="bg-white rounded-lg p-6 shadow-lg relative">
                 <div className="flex items-center justify-center w-24">
-                    <img className="rounded-full" alt={"image-" + card.nom} 
-                        src="https://fastly.picsum.photos/id/129/200/200.jpg?hmac=Y7ERTUfFi4RdOFkUcoOnX_xjWnsy4PA7pJkkFmaQt8c" 
+                    <img className="rounded-full" alt={"imageee-" + card.nom} 
+                        src={card.image} 
                     />
                 </div>
-            <h5 className="mb-2 text-2xl text-center font-bold tracking-tight text-gray-900">{card.nom}</h5>
+            <h5 className="mb-2 text-xl text-center font-bold tracking-tight text-gray-900">{card.nom}</h5>
         </div>
     </div>
     )

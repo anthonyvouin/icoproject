@@ -6,6 +6,7 @@ import { CardType, Card } from "../../game/types";
 
 export default function Cards() {
   const [cards, setCards] = useState<Card[]>([]);
+  const [image, setImage] = useState<File | null>(null);
 
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [nom, setNom] = useState("");
@@ -31,6 +32,11 @@ export default function Cards() {
     fetchCards();
   }, []);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   const handleCardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const cardId = event.target.value;
@@ -45,20 +51,25 @@ export default function Cards() {
 
   const handleUpdateCard = async () => {
     if (!selectedCard) return;
-
+  
+    const formData = new FormData();
+    formData.append("nom", nom);
+    formData.append("description", description);
+    formData.append("type", type);
+    if (image) {
+      formData.append("image", image);
+    }
+  
     try {
       const response = await fetch(`/api/admin/cards/${selectedCard.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nom, description, type }),
+        body: formData,
       });
-
+  
       if (!response.ok) {
         throw new Error("Erreur lors de la mise à jour de la carte");
       }
-
+  
       const updatedCard = await response.json();
       setCards((prevCards) =>
         prevCards.map((card) =>
@@ -69,6 +80,7 @@ export default function Cards() {
       setNom("");
       setDescription("");
       setType("ROLE" as CardType);
+      setImage(null);
     } catch (err) {
       console.error("Erreur lors de la mise à jour de la carte:", err);
     }
@@ -78,6 +90,68 @@ export default function Cards() {
     <div className="min-h-screen bg-gray-50">
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
+            <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Mettre à jour une carte
+              </h3>
+            </div>
+
+            <div className="px-4 py-2 sm:p-6">
+              <div>
+                <select
+                  id="card-select"
+                  className="mt-1 block border w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  value={selectedCard?.id || ""}
+                  onChange={handleCardChange}
+                >
+                  <option value="" disabled>
+                    Sélectionner une carte
+                  </option>
+                  {cards.map((card) => (
+                    <option key={card.id} value={card.id}>
+                      {card.nom}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {selectedCard && (
+                <div>
+                  <div className="my-4">
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                      Description
+                    </label>
+                    <textarea id="description" value={description}
+                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="my-4">
+                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                      Image
+                    </label>
+                    <input
+                      type="file"
+                      id="image"
+                      accept="image/*"
+                      className="mt-1 block w-full text-sm text-gray-500 border-gray-300 rounded-md"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+
+                  <button
+                    type="button" onClick={handleUpdateCard}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Mettre à jour la carte
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
             <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -157,55 +231,6 @@ export default function Cards() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
-            <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Mettre à jour une carte
-              </h3>
-            </div>
-
-            <div className="px-4 py-2 sm:p-6">
-              <div>
-                <select
-                  id="card-select"
-                  className="mt-1 block border w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  value={selectedCard?.id || ""}
-                  onChange={handleCardChange}
-                >
-                  <option value="" disabled>
-                    Sélectionner une carte
-                  </option>
-                  {cards.map((card) => (
-                    <option key={card.id} value={card.id}>
-                      {card.nom}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedCard && (
-                <div>
-                  <div className="my-4">
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                      Description
-                    </label>
-                    <textarea id="description" value={description}
-                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                  </div>
-
-                  <button
-                    type="button" onClick={handleUpdateCard}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Mettre à jour la carte
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
