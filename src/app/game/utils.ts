@@ -1,3 +1,5 @@
+import { Card, CardType } from "./types";
+
 export const getRoleDistribution = (numPlayers: number) => {
   const distribution = {
     7: { pirates: 3, marins: 3, sirene: 1 },
@@ -28,29 +30,11 @@ export const shuffleArray = <T>(array: T[]): T[] => {
   return newArray;
 };
 
-export const createBonusDeck = () => {
-  const bonusCards = [
-    "mal-de-mer",
-    "mer-agitee",
-    "antidote",
-    "observateur",
-    "tribord",
-    "par-dessus-bord",
-    "carte-tresor",
-    "malandrin",
-    "voyage-express",
-    "amarrage",
-    "chanceux",
-    "perroquet",
-    "charlatan",
-    "double",
-    "leviathan",
-    "meduse",
-    "troc",
-    "marchand",
-    "solitaire",
-    "typhon"
-  ] as const;
+export const createBonusDeck = async () => {
+  const response = await fetch('/api/admin/cards');
+  const cards = await response.json();
+
+  const bonusCards = cards.filter((card: Card) => card.type === CardType.BONUS).map((card: Card) => card.nom);
   
   return shuffleArray([...bonusCards]);
 };

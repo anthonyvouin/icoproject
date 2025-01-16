@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BonusCard, GameState, Player, Role } from "./types";
+import { BonusCard, GameState, Player, Role, Card, CardType } from "./types";
 import {
   getRoleDistribution,
   shuffleArray,
@@ -9,6 +9,8 @@ import {
   createActionDeck,
   drawBonusCard,
 } from "./utils";
+import {CardPopin, CardAction, CardConfirm, CardInfo} from "../../components/Card";
+
 import { useRouter } from "next/navigation";
 
 export default function Game() {
@@ -38,6 +40,15 @@ export default function Game() {
   const [timerForRoleRevel, setTimerForRoleRevel] = useState(10);
   const [roundsForWin, setRoundsForWin] = useState(2);
 
+  const [roleCards, setRoleCards] = useState<Card[]>([]);
+  const [bonusCards, setBonusCards] = useState<Card[]>([]);
+  const [actionCards, setActionCards] = useState<Card[]>([]);
+
+  const [popinMessage, setPopinMessage] = useState<string>("");
+  const [onPopinResponse, setOnPopinResponse] = useState<((response: boolean) => void) | null>(null);
+  const [showCardPopin, setShowCardPopin] = useState(false);
+  const [selectedCardPopin, setSelectedCardPopin] = useState<string | null>(null);
+
   const [timerShowROle, setTimerShowROle] = useState(timerForRoleRevel);
   const [votesForCaptain, setVotesForCaptain] = useState<{
     [key: number]: number;
@@ -64,7 +75,7 @@ export default function Game() {
     fetchSettings();
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {  
     const fetchTimer = async () => {
       setIsTimerLoading(true);
       try {
@@ -80,8 +91,22 @@ export default function Game() {
         setIsTimerLoading(false);
       }
     };
-
     fetchTimer();
+
+    const getRolesCard = async () => {
+      const response = await fetch('/api/admin/cards');
+      const cards = await response.json();
+      const role_cards = cards.filter((card: Card) => card.type === 'ROLE' as CardType);    
+      setRoleCards(role_cards);
+
+      const bonus_cards = cards.filter((card: Card) => card.type === 'BONUS' as CardType);    
+      setBonusCards(bonus_cards);
+
+      const action_cards = cards.filter((card: Card) => card.type === 'ACTION' as CardType);    
+      setActionCards(action_cards);
+    };
+    getRolesCard();
+
   }, []);
 
   useEffect(() => {
@@ -111,6 +136,28 @@ export default function Game() {
       }
     };
   }, [gameState.phase, timerShowROle]);
+
+
+  const handleShowPopin = (playerId: number, type: string) => {
+    // Demande de confirmation pour s'assurer que le joueur est bien celui qu'il prétend être
+    const confirmReveal = window.confirm(
+      "Êtes-ce que tu es bien " + gameState.players[playerId].name + " ?"
+    );
+
+    if (confirmReveal) {
+      setShowingRole(playerId);
+      if(type === 'role') {
+        setSelectedCardPopin(gameState.players[playerId].role);
+        setShowCardPopin(true);
+      } else if(type === 'bonus') {
+        setSelectedCardPopin(gameState.players[playerId].bonusCard);
+        setShowCardPopin(true);
+      } else if(type === 'action') {
+        setSelectedCardPopin(gameState.players[playerId].selectedCard);
+        setShowCardPopin(true);
+      }
+    }
+  };
 
   // Ne pas afficher le timer tant qu'il n'est pas chargé
   const displayTimer = isTimerLoading ? null : timerForRoleRevel;
@@ -150,7 +197,7 @@ export default function Game() {
       roles.push("sirene" as Role);
 
       const shuffledRoles = shuffleArray(roles);
-      const bonusCards = createBonusDeck();
+      const bonusCards = await createBonusDeck();
 
       const players = keepPlayers
         ? gameState.players.map((player, index) => ({
@@ -199,81 +246,72 @@ export default function Game() {
   };
 
   const handleVoteForCaptain = (voterId: number, targetId: number) => {
-    setVotesForCaptain((prev) => {
-      const newVotes = { ...prev };
-      newVotes[voterId] = targetId;
-
-      // Si tout le monde a voté, on détermine le capitaine
-      if (Object.keys(newVotes).length === gameState.players.length) {
-        // Compter les votes pour chaque joueur
-        const voteCounts: { [key: number]: number } = {};
-        Object.values(newVotes).forEach((vote) => {
-          voteCounts[vote] = (voteCounts[vote] || 0) + 1;
-        });
-
-        // Trouver le joueur avec le plus de votes
-        let maxVotes = 0;
-        let captainId = 0;
-        Object.entries(voteCounts).forEach(([playerId, votes]) => {
-          if (votes > maxVotes) {
-            maxVotes = votes;
-            captainId = parseInt(playerId);
-          }
-        });
-
-        // Passer à la phase suivante avec le nouveau capitaine
-        setGameState((prev) => ({
-          ...prev,
-          phase: "distribution",
-          currentCaptain: captainId,
-        }));
-      }
-
-      return newVotes;
-    });
-  };
-
-  // Fonction pour confirmer la révélation du rôle d'un joueur
-  const confirmRoleRevel = (playerId: number) => {
-    // Demande de confirmation pour s'assurer que le joueur est bien celui qu'il prétend être
-    const confirmReveal = window.confirm(
-      "Êtes-ce que tu es bien " + gameState.players[playerId].name + " ?"
-    );
-
-    if (confirmReveal) {
-      // Si la confirmation est positive, on met à jour l'état pour montrer le rôle du joueur
-      setShowingRole(playerId);
-
-      // Affichage d'une alerte avec le rôle du joueur
-      alert("Tu es " + gameState.players[playerId].role + " !");
-
-      // Si le joueur a une carte bonus, on affiche également une alerte avec cette information
-      if (gameState.players[playerId].bonusCard !== null) {
-        alert("Ta carte bonus est : " + gameState.players[playerId].bonusCard);
-      }
-    }
+    setPopinMessage(`Est-ce que tu es sûr de vouloir voter pour ${gameState.players[targetId].name} ?`);
+    setShowCardPopin(true);
+  
+    const handleResponse = (response: boolean) => {
+      if (!response) return;
+  
+      setVotesForCaptain((prev) => {
+        const newVotes = { ...prev };
+        newVotes[voterId] = targetId;
+  
+        // Si tout le monde a voté, on détermine le capitaine
+        if (Object.keys(newVotes).length === gameState.players.length) {
+          const voteCounts: { [key: number]: number } = {};
+          Object.values(newVotes).forEach((vote) => {
+            voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+          });
+  
+          let maxVotes = 0;
+          let captainId = 0;
+          Object.entries(voteCounts).forEach(([playerId, votes]) => {
+            if (votes > maxVotes) {
+              maxVotes = votes;
+              captainId = parseInt(playerId);
+            }
+          });
+  
+          setGameState((prev) => ({
+            ...prev,
+            phase: "distribution",
+            currentCaptain: captainId,
+          }));
+        }
+  
+        return newVotes;
+      });
+    };
+  
+    setOnPopinResponse(() => handleResponse); // Enregistrez la fonction pour être utilisée par la modale.
   };
 
   // Confirmation de l'équipage
   const handleConfirmCrew = () => {
-    const confirmCrew = window.confirm(
-      "Est-ce que tout le monde est d'accord avec cet équipage ?"
-    );
-    if (confirmCrew) {
-      setGameState((prev) => ({ ...prev, phase: "card-playing" }));
-    } else {
-      setGameState((prev) => ({
-        ...prev,
-        currentCaptain: (prev.currentCaptain + 1) % prev.players.length,
-        selectedCrew: [],
-        players: prev.players.map((player) => ({
-          ...player,
-          isInCrew: false,
-        })),
-      }));
-    }
+    setShowCardPopin(true);
+    setPopinMessage("Est-ce que tout le monde est d'accord avec cet équipage ?");
+  
+    const handleResponse = (response: boolean) => {
+      if (response) {
+        // Si l'utilisateur confirme
+        setGameState((prev) => ({ ...prev, phase: "card-playing" }));
+      } else {
+        // Si l'utilisateur refuse
+        setGameState((prev) => ({
+          ...prev,
+          currentCaptain: (prev.currentCaptain + 1) % prev.players.length,
+          selectedCrew: [],
+          players: prev.players.map((player) => ({
+            ...player,
+            isInCrew: false,
+          })),
+        }));
+      }
+    };
+  
+    setOnPopinResponse(() => handleResponse); // Enregistrez la logique à exécuter après la réponse.
   };
-
+  
   // Vote pour la sirène
   const handleSirenVote = (voterId: number, targetId: number) => {
     setVotesForSiren((prev) => {
@@ -362,6 +400,14 @@ export default function Game() {
 
   // Fonction pour jouer une carte
   const playCard = (playerId: number, card: "ile" | "poison") => {
+    const player = gameState.players.find((player) => player.id === playerId);
+
+    if((player?.role == "marin" || player?.role == "sirene") && card == "poison") {
+      setShowCardPopin(true);
+      setPopinMessage("Les pirates ne peuvent pas jouer la carte île");
+      return
+    }
+
     setGameState((prev) => {
       const updatedPlayers = prev.players.map((player) =>
         player.id === playerId ? { ...player, selectedCard: card } : player
@@ -578,6 +624,18 @@ export default function Game() {
                 );
               })}
             </div>
+
+            {/* Affichage conditionnel de la modale */}
+            {showCardPopin && (
+              <CardConfirm
+                nom={popinMessage}
+                onClose={() => setShowCardPopin(false)}
+                onConfirm={(response) => {
+                  if (onPopinResponse) onPopinResponse(response);
+                  setShowCardPopin(false);
+                }}
+              />
+            )}
           </div>
         );
 
@@ -585,6 +643,7 @@ export default function Game() {
       case "distribution":
         return (
           <div className="max-w-4xl mx-auto p-4">
+            {/* Affichage des rôles */}
             <h2 className="text-2xl font-bold mb-4">Distribution des rôles</h2>
             <p className="mb-4">
               Capitaine : {gameState.players[gameState.currentCaptain]?.name}
@@ -593,24 +652,37 @@ export default function Game() {
               {gameState.players.map((player) => (
                 <div key={player.id} className="p-4 border rounded">
                   <h3 className="font-bold">{player.name}</h3>
-                  <button
-                    onClick={() => confirmRoleRevel(player.id)}
-                    className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
-                  >
-                    Voir mon rôle
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button onClick={() => handleShowPopin(player.id, 'role')}
+                      className="text-indigo-600"
+                    >
+                      Voir mon rôle
+                    </button>
+
+                    {player.bonusCard && (
+                      <button onClick={() => handleShowPopin(player.id, 'bonus')}
+                        className="text-emerald-600"
+                      >
+                        Voir mon bonus
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
+
+            {/* Passage à la next step */}
             <button
-              onClick={() => {
-                setShowingRole(null);
-                handlePhaseChange();
-              }}
+              onClick={() => { setShowingRole(null); handlePhaseChange(); }}
               className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
             >
               Fermer les yeux
             </button>
+
+            {/* Affichage conditionnel de la modale */}
+            {showCardPopin && selectedCardPopin && (
+              <CardPopin nom={selectedCardPopin} onClose={() => setShowCardPopin(false)} />
+            )}
           </div>
         );
 
@@ -660,6 +732,7 @@ export default function Game() {
               Capitaine ({gameState.players[gameState.currentCaptain]?.name}),
               sélectionnez 3 membres d'équipage :
             </p>
+
             <div className="grid grid-cols-2 gap-4">
               {gameState.players.map((player) => (
                 <div
@@ -676,6 +749,7 @@ export default function Game() {
                 </div>
               ))}
             </div>
+
             {gameState.selectedCrew.length === 3 && (
               <button
                 onClick={() => {
@@ -685,6 +759,18 @@ export default function Game() {
               >
                 Confirmer l'équipage
               </button>
+            )}
+
+            {/* Affichage conditionnel de la modale */}
+            {showCardPopin && (
+              <CardConfirm
+                nom={popinMessage}
+                onClose={() => setShowCardPopin(false)}
+                onConfirm={(response) => {
+                  if (onPopinResponse) onPopinResponse(response);
+                  setShowCardPopin(false);
+                }}
+              />
             )}
           </div>
         );
@@ -710,22 +796,25 @@ export default function Game() {
                           onClick={() => playCard(crewId, "ile")}
                           className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition-colors"
                         >
-                          Jouer Île
+                          <CardAction nom={"ile"}  />
                         </button>
-                        {player?.role === "pirate" && (
-                          <button
-                            onClick={() => playCard(crewId, "poison")}
-                            className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors"
-                          >
-                            Jouer Poison
-                          </button>
-                        )}
+                        <button
+                          onClick={() => playCard(crewId, "poison")}
+                          className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors"
+                        >
+                          <CardAction nom={"poisson"}  />
+                        </button>
                       </div>
                     )}
                     {player?.selectedCard && <p>Carte jouée ✓</p>}
                     {!isCurrentPlayer && !player?.selectedCard && (
                       <p>En attente...</p>
                     )}
+
+                  {/* Affichage conditionnel de la modale */}
+                  {showCardPopin && (
+                    <CardInfo nom={popinMessage} onClose={() => setShowCardPopin(false)} />
+                  )}
                   </div>
                 );
               })}

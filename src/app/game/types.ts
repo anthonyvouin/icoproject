@@ -63,3 +63,18 @@ export interface GameState {
   actionCardsDeck: ActionCard[];
   winner: "pirates" | "marines" | "sirene" | null;
 }
+
+export enum CardType {
+  ROLE = "ROLE",
+  BONUS = "BONUS",
+  ACTION = "ACTION"
+}
+
+export interface Card {
+  id: number;
+  nom: string;
+  description: string;
+  type: CardType;
+  createdAt: Date;
+  updatedAt: Date;
+}

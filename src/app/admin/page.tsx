@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+import { Card, CardType } from "../game/types";
+
 interface User {
   id: number;
   email: string;
@@ -19,6 +21,7 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
+  const [cards, setCards] = useState<Card[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -118,6 +121,22 @@ export default function AdminDashboard() {
     };
 
     fetchData();
+    const fetchCards = async () => {
+      try {
+        const response = await fetch("/api/admin/cards");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Erreur lors du chargement des cartes"
+          );
+        }
+        setCards(data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des cartes:", err);
+      }
+    }
+    fetchCards();
   }, []);
 
   if (loading) {
@@ -454,6 +473,88 @@ export default function AdminDashboard() {
                         >
                           Supprimer
                         </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
+            <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Liste des cartes
+              </h3>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nom
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date de création
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date de mise à jour
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {cards.map((card) => (
+                    <tr
+                      key={card.id}
+                      className="hover:bg-gray-50 transition-colors duration-150 ease-in-out"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        #{card.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                        {card.nom}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {card.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            card.type === "ROLE"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          } transition-colors duration-150 ease-in-out`}
+                        >
+                          {card.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(card.createdAt).toLocaleDateString("fr-FR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(card.updatedAt).toLocaleDateString("fr-FR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
                       </td>
                     </tr>
                   ))}
