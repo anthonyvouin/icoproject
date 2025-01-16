@@ -34,7 +34,7 @@ export const createBonusDeck = async () => {
   const response = await fetch('/api/admin/cards');
   const cards = await response.json();
 
-  const bonusCards = cards.filter((card: Card) => card.type === CardType.BONUS).map((card: Card) => card.nom);
+  const bonusCards = shuffleArray(cards.filter((card: Card) => card.type === CardType.BONUS));
   
   return shuffleArray([...bonusCards]);
 };

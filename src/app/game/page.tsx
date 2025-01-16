@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BonusCard, GameState, Player, Role, Card, CardType } from "./types";
+import { Role, GameState, Player, Card, CardType } from "./types";
 import {
   getRoleDistribution,
   shuffleArray,
@@ -150,7 +150,7 @@ export default function Game() {
         setSelectedCardPopin(gameState.players[playerId].role);
         setShowCardPopin(true);
       } else if(type === 'bonus') {
-        setSelectedCardPopin(gameState.players[playerId].bonusCard);
+        setSelectedCardPopin(gameState.players[playerId].bonusCard.nom);
         setShowCardPopin(true);
       } else if(type === 'action') {
         setSelectedCardPopin(gameState.players[playerId].selectedCard);
@@ -168,7 +168,8 @@ export default function Game() {
       playerNames.filter((name) => name.trim() !== "")
     );
     if (uniqueNames.size !== numPlayers) {
-      alert("Veuillez entrer un nom unique pour chaque joueur.");
+      setShowCardPopin(true);
+      setPopinMessage("Veuillez entrer un nom unique pour chaque joueur !");
       return;
     }
 
@@ -192,9 +193,9 @@ export default function Game() {
       const distribution = getRoleDistribution(numPlayers);
 
       for (let i = 0; i < distribution.pirates; i++)
-        roles.push("pirate" as Role);
-      for (let i = 0; i < distribution.marins; i++) roles.push("marin" as Role);
-      roles.push("sirene" as Role);
+        roles.push("pirate");
+      for (let i = 0; i < distribution.marins; i++) roles.push("marin");
+      roles.push("sirene");
 
       const shuffledRoles = shuffleArray(roles);
       const bonusCards = await createBonusDeck();
@@ -203,7 +204,7 @@ export default function Game() {
         ? gameState.players.map((player, index) => ({
             ...player,
             role: shuffledRoles[index] as Role,
-            bonusCard: drawBonusCard(bonusCards) as BonusCard,
+            bonusCard: drawBonusCard(bonusCards) as unknown as Card,
             hasVoted: false,
             isInCrew: false,
             selectedCard: null,
@@ -214,7 +215,7 @@ export default function Game() {
               id: index,
               name: playerNames[index] || `Joueur ${index + 1}`,
               role: shuffledRoles[index] as Role,
-              bonusCard: drawBonusCard(bonusCards) as BonusCard,
+              bonusCard: drawBonusCard(bonusCards) as unknown as Card,
               hasVoted: false,
               isInCrew: false,
               selectedCard: null,
@@ -404,7 +405,7 @@ export default function Game() {
 
     if((player?.role == "marin" || player?.role == "sirene") && card == "poison") {
       setShowCardPopin(true);
-      setPopinMessage("Les pirates ne peuvent pas jouer la carte île");
+      setPopinMessage("Tu n'es pas un pirate donc joue la carte île !");
       return
     }
 
@@ -440,7 +441,7 @@ export default function Game() {
   // Fonction pour évaluer la manche
   const evaluateRound = () => {
     const poisonPlayed = gameState.playedCards.some(
-      (card) => card === "poison"
+      (card) => card == "poison"
     );
     const newScore = { ...gameState.score };
 
@@ -567,6 +568,11 @@ export default function Game() {
                 )}
               </div>
             </div>
+
+            {/* Affichage conditionnel de la modale */}
+            {showCardPopin && (
+              <CardInfo nom={popinMessage} onClose={() => setShowCardPopin(false)} />
+            )}
           </div>
         );
 
@@ -836,12 +842,12 @@ export default function Game() {
                     <h3 className="font-bold">{player?.name}</h3>
                     <p
                       className={`mt-2 font-bold ${
-                        player?.selectedCard === "poison"
+                        player?.selectedCard == "poison"
                           ? "text-red-500"
                           : "text-green-500"
                       }`}
                     >
-                      {player?.selectedCard === "poison"
+                      {player?.selectedCard == "poison"
                         ? "☠️ Poison"
                         : "🏝️ Île"}
                     </p>
@@ -851,7 +857,7 @@ export default function Game() {
             </div>
             <div className="text-center">
               <p className="text-xl mb-4">
-                {gameState.playedCards.some((card) => card === "poison")
+                {gameState.playedCards.some((card) => card == "poison")
                   ? "L'équipage a été empoisonné ! Les pirates gagnent la manche !"
                   : "L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !"}
               </p>
