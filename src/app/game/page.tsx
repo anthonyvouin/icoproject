@@ -136,7 +136,18 @@ export default function Game() {
       }
     };
   }, [gameState.phase, timerShowROle]);
+  
+  const [isFilled, setIsFilled] = useState<boolean[]>([]);
 
+  const handleInputChange = (index: number, value: string) => {
+    const newPlayerNames = [...playerNames];
+    newPlayerNames[index] = value;
+    setPlayerNames(newPlayerNames);
+
+    const newIsFilled = [...isFilled];
+    newIsFilled[index] = value.trim() !== "";
+    setIsFilled(newIsFilled);
+  };
 
   const handleShowPopin = (playerId: number, type: string) => {
     // Demande de confirmation pour s'assurer que le joueur est bien celui qu'il prétend être
@@ -204,7 +215,7 @@ export default function Game() {
         ? gameState.players.map((player, index) => ({
             ...player,
             role: shuffledRoles[index] as Role,
-            bonusCard: drawBonusCard(bonusCards) as unknown as Card,
+            bonusCard: drawBonusCard(bonusCards as Card[]) || { id: 0, nom: '', description: '', type: 'BONUS' as CardType, image: '', createdAt: new Date(), updatedAt: new Date() },
             hasVoted: false,
             isInCrew: false,
             selectedCard: null,
@@ -215,7 +226,7 @@ export default function Game() {
               id: index,
               name: playerNames[index] || `Joueur ${index + 1}`,
               role: shuffledRoles[index] as Role,
-              bonusCard: drawBonusCard(bonusCards) as unknown as Card,
+              bonusCard: drawBonusCard(bonusCards as Card[]) || { id: 0, nom: '', description: '', type: 'BONUS' as CardType, image: '', createdAt: new Date(), updatedAt: new Date() },
               hasVoted: false,
               isInCrew: false,
               selectedCard: null,
@@ -232,7 +243,7 @@ export default function Game() {
           pirates: 0,
           marines: 0,
         },
-        bonusCardsDeck: bonusCards,
+        bonusCardsDeck: bonusCards as Card[],
         actionCardsDeck: createActionDeck(),
         winner: null,
       });
@@ -500,73 +511,116 @@ export default function Game() {
       // Phase de configuration de la partie
       case "setup":
         return (
-          <div className="max-w-4xl mx-auto p-4">
-            <h1 className="text-3xl font-bold text-center mb-8">ICO!</h1>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">
-                Configuration de la partie
-              </h2>
-              <div className="mb-6">
-                {/* Sélection du nombre de joeurs */}
-                {!validPlayersNumber && (
-                  <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">
-                      Nombre de joueurs (7-20)
-                    </label>
-                    <input
-                      type="range"
-                      min="7"
-                      max="20"
-                      value={playerCount}
-                      className="w-full mb-4"
-                      onChange={(e) => {
-                        const count = Number(e.target.value);
-                        setPlayerCount(count);
-                        setPlayerNames(Array(count).fill(""));
-                      }}
-                    />
-                    <div className="text-center text-gray-700 mb-4">
-                      {playerCount} joueurs
-                    </div>
+          <div className="max-w-7xl mx-8 px-4 sm:px-8 lg:px-10 py-12 md:py-24 m-4">
+            <div className="bg-[#E9DBC2] rounded-lg shadow p-2 ">
+              <h2 className="text-black font-bold mb-4 ">Configuration de la partie</h2>
+                
+                {/* Sélection du nombre de joueurs */}
+                <div className="mb-6 ">
+                    {!validPlayersNumber && (
+                      <div className="mb-4">
+                        <label className="block text-gray-700 mb-2">Nombre de joueurs (7-20)</label>
+                        <input 
+                          type="range" 
+                          min="7" 
+                          max="20" 
+                          value={playerCount} 
+                          className="w-full mb-4 curseur-personnalise" 
+                          onChange={(e) => { 
+                            const count = Number(e.target.value); 
+                            setPlayerCount(count);
+                            setPlayerNames(Array(count).fill(""));
 
-                    <button
-                      onClick={() => setValidPlayersNumber(true)}
-                      className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
-                    >
-                      Valider le nombre de joueurs
-                    </button>
+                            // Mettre à jour l'arrière-plan du curseur
+                            const percentage = ((count - 7) / (20 - 7)) * 100;
+                            e.target.style.background = `linear-gradient(to right, #383837 ${percentage}%, #ddd ${percentage}%)`;
+
+                            // Afficher la distribution des rôles
+                            const distribution = getRoleDistribution(count);
+                            console.log(distribution);
+                          }}
+                          style={{
+                            appearance: 'none',
+                            background: 'linear-gradient(to right,#383837 0%, #ddd 0%)',
+                            borderRadius: '10px',
+                            height: '8px',
+                            outline: 'none',
+                          }}
+                        />
+          
+                        <div className="text-center text-gray-700 mb-4">
+                          {playerCount} joueurs
+                        </div>
+          
+                        <button
+                          onClick={() => setValidPlayersNumber(true)}
+                          className="w-full bg-[#383837]  text-white py-2 px-4 rounded "
+                        >
+                          Valider le nombre de joueurs
+                        </button>
+                      </div>
+                    )}
+                </div>
+            </div>
+            
+            <div>
+              {/* Distribution des rôles */}
+              <div className="mb-4">
+                {!validPlayersNumber && (
+                  <div className="text-black gap-2">
+                    
+                    <div className="grid grid-cols-2 gap-4 p-2">
+                    {
+                      roleCards.map((card) => (
+                        <div key={"card" + card.id} className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                          {/* Image des cards  */}
+                          <img
+                            src={card.image}
+                            alt={card.image}
+                            className="w-full object-cover"
+                          />
+                          {/* Petit carré pour le nombre */}
+                          <div className="absolute top-1 right-0 bg-[#383837] text-white rounded-none w-6 h-6 flex items-center justify-center text-xs font-bold">
+                            {card.nom === "pirate" ? getRoleDistribution(playerCount).pirates : null}
+                            {card.nom === "marin" ? getRoleDistribution(playerCount).marins : null}
+                            {card.nom === "sirene" ? getRoleDistribution(playerCount).sirene : null}
+                          </div>
+                        </div>
+                      ))
+                    }
+                    </div>
                   </div>
                 )}
-
-                {/* Saisie des noms des joueurs */}
-                {validPlayersNumber && (
-                  <div className="space-y-3">
-                    {Array.from({ length: playerCount }, (_, index) => (
-                      <div key={index} className="flex items-center">
-                        <label className="w-24">Joueur {index + 1}:</label>
-                        <input
-                          type="text"
-                          value={playerNames[index] || ""}
-                          onChange={(e) => {
-                            const newNames = [...playerNames];
-                            newNames[index] = e.target.value;
-                            setPlayerNames(newNames);
-                          }}
-                          placeholder={`Nom du joueur ${index + 1}`}
-                          className="flex-1 p-2 border rounded"
-                        />
+              </div>
+              {/* Saisie des noms des joueurs */}
+              {validPlayersNumber && (
+                  <div className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6 xl:space-y-8">
+                      <div>
+                        {Array.from({ length: playerCount }, (_, index) => (
+                          <div key={index} className="bg-[#E9DBC2] p-1 rounded-lg mt-4 flex items-center">
+                            <label className="rounded-lg p-4 text-black">
+                              <img src="/Icon - joueur-conf.png" alt="Player Icon" />
+                            </label>
+                            <input
+                              type="text"
+                              value={playerNames[index] || ""}
+                              onChange={(e) => handleInputChange(index, e.target.value)}
+                              placeholder={`Nom du joueur ${index + 1}`}
+                              className={`flex-1 text-black p-2 mr-2 rounded-lg ${
+                                isFilled[index] ? "bg-[#E9DBC2]" : ""
+                              }`}
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-
                     <button
                       onClick={() => initializeGame(playerCount, false)}
-                      className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+                      className="w-full bg-[#383837]  text-white py-2 px-4 rounded-lg "
                     >
                       Commencer la partie
                     </button>
                   </div>
                 )}
-              </div>
             </div>
 
             {/* Affichage conditionnel de la modale */}
@@ -580,8 +634,10 @@ export default function Game() {
       case "captain-vote":
         return (
           <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Élection du Capitaine</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4">
+              Élection du Capitaine
+            </h2>
+            <div className="grid grid-cols-2">
               {gameState.players.map((voter, index) => {
                 // Vérifier si le joueur a déjà voté
                 const hasVoted = votesForCaptain[voter.id] !== undefined;
@@ -591,11 +647,14 @@ export default function Game() {
                   Object.keys(votesForCaptain).length === index;
 
                 return (
-                  <div key={voter.id} className="p-4 border rounded">
+                  <div 
+                    key={voter.id} 
+                    className="p-4 m-4 bg-[#383837] border rounded-lg"
+                  >
                     <h3 className="font-bold mb-2">{voter.name}</h3>
                     {!hasVoted && isCurrentVoter ? (
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">
+                      <div className="space-y-2 ">
+                        <p className="text-sm text-[#E9DBC2] mt-4">
                           Votez pour un capitaine :
                         </p>
                         <div className="grid gap-2">
@@ -604,18 +663,18 @@ export default function Game() {
                             .map((candidate) => (
                               <button
                                 key={candidate.id}
-                                className="bg-indigo-600 text-white py-1 px-3 rounded hover:bg-indigo-700 transition-colors"
+                                className="bg-[#E9DBC2] text-black font-bold p-2 rounded transition-colors"
                                 onClick={() =>
                                   handleVoteForCaptain(voter.id, candidate.id)
                                 }
                               >
-                                Voter pour {candidate.name}
+                               {candidate.name}
                               </button>
                             ))}
                         </div>
                       </div>
                     ) : hasVoted ? (
-                      <p className="text-green-600">
+                      <p className="bg-[#E9DBC2] text-black font-bold py-1 px-3 rounded transition-colors">
                         A voté pour{" "}
                         {
                           gameState.players.find(
@@ -624,7 +683,7 @@ export default function Game() {
                         }
                       </p>
                     ) : (
-                      <p className="text-gray-600">En attente de vote...</p>
+                      <p className="bg-[#7D4E1D]">En attente de vote...</p>
                     )}
                   </div>
                 );
@@ -644,28 +703,29 @@ export default function Game() {
             )}
           </div>
         );
-
       // Phase de distribution des rôles
       case "distribution":
         return (
           <div className="max-w-4xl mx-auto p-4">
             {/* Affichage des rôles */}
-            <h2 className="text-2xl font-bold mb-4">Distribution des rôles</h2>
-            <p className="mb-4">
+            <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4">
+              Distribution des rôles
+            </h2>
+            <p className="bg-[#E9DBC2] mt-2 text-black p-2 rounded-lg mb-4">
               Capitaine : {gameState.players[gameState.currentCaptain]?.name}
             </p>
             <div className="grid grid-cols-2 gap-4">
               {gameState.players.map((player) => (
-                <div key={player.id} className="p-4 border rounded">
+                <div key={player.id} className="p-4 bg-[#383837] border rounded-lg">
                   <h3 className="font-bold">{player.name}</h3>
                   <div className="flex gap-2 mt-2">
                     <button onClick={() => handleShowPopin(player.id, 'role')}
-                      className="text-indigo-600"
+                      className="text-[#E9DBC2]"
                     >
                       Voir mon rôle
                     </button>
 
-                    {player.bonusCard && (
+                    {player.bonusCard.nom && (
                       <button onClick={() => handleShowPopin(player.id, 'bonus')}
                         className="text-emerald-600"
                       >
@@ -680,7 +740,7 @@ export default function Game() {
             {/* Passage à la next step */}
             <button
               onClick={() => { setShowingRole(null); handlePhaseChange(); }}
-              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700"
+              className="mt-4 bg-[#E9DBC2] text-black font-black py-2 px-4 rounded-lg "
             >
               Fermer les yeux
             </button>
@@ -695,73 +755,78 @@ export default function Game() {
       // Phase de transition
       case "eyes-closed":
         return (
-          <div className="max-w-4xl mx-auto p-4 text-center">
-            <h2 className="text-3xl font-bold mb-8">
-              Tout le monde ferme les yeux
-            </h2>
-            <p className="mb-4">
-              Le capitaine va appeler les pirates et la sirène...
-            </p>
-            <button
-              onClick={handlePhaseChange}
-              className="bg-indigo-600 text-white py-2 px-4 rounded"
-            >
-              Appeler les pirates et la sirène
-            </button>
+          <div className="flex justify-center items-center h-screen md:h-auto">
+            <div className="bg-[#383837] max-w-md mx-auto p-4 text-center rounded-lg md:max-w-lg lg:max-w-4xl">
+              <h2 className="text-3xl font-bold mb-8">
+                Tout le monde ferme les yeux
+              </h2>
+              
+              <p className="mb-4">
+                Le capitaine va appeler les pirates et la sirène...
+              </p>
+              <button
+                onClick={handlePhaseChange}
+                className="bg-[#E9DBC2] text-black py-2 px-4 rounded"
+              >
+                Appeler les pirates et la sirène
+              </button>
+            </div>
           </div>
         );
 
       // Phase de révélation des rôles
       case "eyes-open":
         return (
-          <div className="max-w-4xl mx-auto p-4 text-center">
-            <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
-            <p className="mb-4">Regardez qui sont vos alliés...</p>
-            <p className="text-2xl font-bold mb-4">
-              {timerShowROle} secondes restantes
-            </p>
-            <button
-              onClick={handlePhaseChange}
-              className="bg-indigo-600 text-white py-2 px-4 rounded"
-            >
-              Ouvrer les yeux et commencer la partie
-            </button>
+          <div className="flex justify-center items-center h-screen md:h-auto">
+            <div className="bg-[#383837] max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
+              <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
+              <p className="mb-4">Regardez qui sont vos alliés...</p>
+              <p className="text-2xl font-bold mb-4">
+                {timerShowROle} secondes restantes
+              </p>
+              <button
+                onClick={handlePhaseChange}
+                className="bg-[#E9DBC2] text-black py-2 px-4 rounded"
+              >
+                Ouvrer les yeux et commencer la partie
+              </button>
+            </div>
           </div>
         );
-
       // Phase de sélection de l'équipage
       case "crew-selection":
         return (
-          <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Sélection de l'équipage</h2>
-            <p className="mb-4">
-              Capitaine ({gameState.players[gameState.currentCaptain]?.name}),
-              sélectionnez 3 membres d'équipage :
+          <div className="max-w-4xl mx-auto p-4 mt-6">
+            <h2 className="bg-[#E9DBC2] rounded-lg text-black font-bold shadow p-2">Sélection de l'équipage</h2>
+            <p className="bg-[#E9DBC2] rounded-lg text-black font-bold shadow p-2 mt-20">
+              Capitaine : ({gameState.players[gameState.currentCaptain]?.name}) !
             </p>
-
-            <div className="grid grid-cols-2 gap-4">
-              {gameState.players.map((player) => (
-                <div
-                  key={player.id}
-                  onClick={() => selectCrewMember(player.id)}
-                  className={`p-4 border rounded cursor-pointer ${
-                    player.isInCrew ? "bg-indigo-100 border-indigo-500" : ""
-                  }`}
-                >
-                  <h3>{player.name}</h3>
-                  {player.isInCrew && (
-                    <span className="text-indigo-600">Sélectionné</span>
-                  )}
-                </div>
-              ))}
+            <div className="bg-[#383837] p-2 mt-2 mb-4 rounded-lg shadow">
+              <p className=" text-white font-bold mt-4 mb-2">sélectionnez 3 membres d'équipage :
+              </p>
+              <div className="grid  grid-cols-2 gap-4">
+                {gameState.players.map((player) => (
+                  <div
+                    key={player.id}
+                    onClick={() => selectCrewMember(player.id)}
+                    className={`p-4 border text-black bg-[#E9DBC2] rounded-lg cursor-pointer ${
+                      player.isInCrew ? "bg-[#7D4E1D] border-white" : ""
+                    }`}
+                  >
+                    <h3>{player.name}</h3>
+                    {player.isInCrew && (
+                      <span className="text-white ">Sélectionné</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-
             {gameState.selectedCrew.length === 3 && (
               <button
                 onClick={() => {
                   handleConfirmCrew();
                 }}
-                className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded"
+                className="mt-4 flex bg-[#383837] text-white py-2 px-4 rounded-lg "
               >
                 Confirmer l'équipage
               </button>
@@ -784,9 +849,9 @@ export default function Game() {
       // Phase de jeu
       case "card-playing":
         return (
-          <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Phase de jeu</h2>
-            <div className="grid grid-cols-1 gap-4">
+          <div className="max-w-4xl mx-auto p-4 ">
+            <h2 className="bg-[#E9DBC2] rounded-lg shadow p-2 text-black font-bold">Phase de jeu</h2>
+            <div className="mt-4 shadow rounded-lg grid grid-cols-1 gap-4">
               {gameState.selectedCrew.map((crewId, index) => {
                 // Récupérer le joueur correspondant à l'ID
                 const player = gameState.players.find((p) => p.id === crewId);
@@ -794,27 +859,27 @@ export default function Game() {
                 // Vérifier si c'est le tour du joueur actuel
                 const isCurrentPlayer = index === gameState.playedCards.length;
                 return (
-                  <div key={crewId} className="p-4 border rounded">
-                    <h3 className="font-bold">{player?.name}</h3>
+                  <div key={crewId} className="p-4 bg-[#E9DBC2] border rounded shadow ">
+                    <h3 className="font-bold text-black">{player?.name}</h3>
                     {isCurrentPlayer && !player?.selectedCard && (
-                      <div className="mt-2 space-x-2">
+                      <div className="mt-2 space-x-4 text-center">
                         <button
                           onClick={() => playCard(crewId, "ile")}
-                          className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition-colors"
                         >
                           <CardAction nom={"ile"}  />
                         </button>
                         <button
                           onClick={() => playCard(crewId, "poison")}
-                          className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors"
                         >
-                          <CardAction nom={"poisson"}  />
+                          <CardAction nom={"poison"}  />
                         </button>
                       </div>
                     )}
-                    {player?.selectedCard && <p>Carte jouée ✓</p>}
+                    {player?.selectedCard && <p className="font-bold text-[#7D4E1D]"> Carte jouée ✓</p>}
                     {!isCurrentPlayer && !player?.selectedCard && (
-                      <p>En attente...</p>
+                      <p className="font-bold text-[#7D4E1D]">
+                         En attente...
+                      </p>
                     )}
 
                   {/* Affichage conditionnel de la modale */}
@@ -829,63 +894,92 @@ export default function Game() {
         );
 
       // Phase de révélation des cartes
-      case "reveal-cards":
-        return (
-          <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Révélation des cartes</h2>
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {shuffleArray(gameState.selectedCrew).map((crewId) => {
-                // Récupérer le joueur correspondant à l'ID
-                const player = gameState.players.find((p) => p.id === crewId);
-                return (
-                  <div key={crewId} className="p-4 border rounded text-center">
-                    <h3 className="font-bold">{player?.name}</h3>
-                    <p
-                      className={`mt-2 font-bold ${
-                        player?.selectedCard == "poison"
-                          ? "text-red-500"
-                          : "text-green-500"
-                      }`}
-                    >
-                      {player?.selectedCard == "poison"
-                        ? "☠️ Poison"
-                        : "🏝️ Île"}
-                    </p>
-                  </div>
-                );
-              })}
+        case "reveal-cards":
+          return (
+            <div className="max-w-4xl mx-auto p-4 flex flex-col justify-between">
+              <div>
+                <h2 className="text-black font-bold mb-4 bg-[#E9DBC2] rounded-lg shadow p-2">
+                  Révélation des cartes
+                </h2>
+          
+          <div className="grid grid-cols-1 gap-4">
+                {/* Container pour les cartes de l'équipage */}
+                <div className="grid grid-cols-1 gap-4 w-48 h-48">
+                  {shuffleArray(gameState.selectedCrew).map((crewId) => {
+                    // Récupérer le joueur correspondant à l'ID
+                    const player = gameState.players.find((p) => p.id === crewId);
+                    return (
+                      <div key={crewId}> {/* Le key doit être sur l'élément parent */}
+                        <div className="p-4 rounded-lg shadow border bg-[#E9DBC2] text-center">
+                          <div className="mt-2">
+                            {player?.selectedCard === "poison" ? (
+                              <div className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                                {/* Image Poison */}
+                                <img
+                                  src="/img/poison_illu.png"
+                                  alt="Poison"
+                                  className="w-full object-cover"
+                                />
+                                {/* Petit carré pour l'information */}
+                                <div className="absolute top-1 right-0 bg-[#383837] text-white rounded-none w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                  Poison
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                                {/* Image Île */}
+                                <img
+                                  src="/img/ile-illu.png"
+                                  alt="Île"
+                                  className="w-full object-cover"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+          
+              {/* Résultat de la manche */}
+              <div className="text-center">
+                <p className="text-xl text-black rounded-lg shadow border bg-[#E9DBC2] rounded-lg mb-4">
+                  {gameState.playedCards.some((card) => card == "poison")
+                    ? "L'équipage a été empoisonné ! Les pirates gagnent la manche !"
+                    : "L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !"}
+                </p>
+          
+                {/* Bouton pour voir le score */}
+                <button
+                  onClick={handlePhaseChange}
+                  className="bg-[#383837] text-white py-2 px-4 rounded-lg hover:bg-[#2c2a29] transition-all"
+                >
+                  Voir le score
+                </button>
+              </div>
+</div>
             </div>
-            <div className="text-center">
-              <p className="text-xl mb-4">
-                {gameState.playedCards.some((card) => card == "poison")
-                  ? "L'équipage a été empoisonné ! Les pirates gagnent la manche !"
-                  : "L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !"}
-              </p>
-              <button
-                onClick={handlePhaseChange}
-                className="bg-indigo-600 text-white py-2 px-4 rounded"
-              >
-                Voir le score
-              </button>
-            </div>
-          </div>
-        );
+          );
+          
+          
 
       // Phase de résultat
       case "result":
         return (
           <div className="max-w-4xl mx-auto p-4">
             {/* Résultat du round */}
-            <h2 className="text-2xl font-bold mb-6">Résultat de la manche</h2>
+            <h2 className="text-2xl text-black font-bold mb-6 bg-[#E9DBC2] rounded-lg shadow p-2">Résultat de la manche</h2>
             <div className="bg-white rounded-lg shadow p-6 mb-6">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="text-center">
-                  <h3 className="text-xl font-bold mb-2">Pirates</h3>
-                  <p className="text-3xl">{gameState.score.pirates}</p>
+                  <h3 className="text-xl text-black font-bold mb-2">Pirates</h3>
+                  <p className="text-3xl text-[#383837]">{gameState.score.pirates}</p>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-xl font-bold mb-2">Marines</h3>
-                  <p className="text-3xl">{gameState.score.marines}</p>
+                  <h3 className="text-xl text-black font-bold mb-2">Marines</h3>
+                  <p className="text-3xl text-[#383837]">{gameState.score.marines}</p>
                 </div>
               </div>
             </div>
@@ -906,7 +1000,7 @@ export default function Game() {
                           phase: "final-vote",
                         }))
                       }
-                      className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded"
+                      className="mt-4 bg-[#383837] text-white py-2 px-4 rounded-lg"
                     >
                       Passer au vote final
                     </button>
@@ -917,13 +1011,13 @@ export default function Game() {
                       onClick={() => {
                         initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
                       }}
-                      className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
+                      className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors"
                     >
                       Recommencer avec les mêmes joueurs
                     </button>
                     <button
                       onClick={() => window.location.reload()}
-                      className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors ml-4"
+                      className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors ml-4"
                     >
                       Nouvelle partie
                     </button>
@@ -933,7 +1027,7 @@ export default function Game() {
             ) : (
               <div className="text-center">
                 {/* Anonce du prochain capitaine */}
-                <p className="mb-4">
+                <p className="mb-4 text-black font-bold ">
                   Le prochain capitaine sera :{" "}
                   {
                     gameState.players[
@@ -943,7 +1037,7 @@ export default function Game() {
                 </p>
                 <button
                   onClick={nextRound}
-                  className="bg-indigo-600 text-white py-2 px-4 rounded"
+                  className="bg-[#383837] text-white py-2 px-4 rounded"
                 >
                   Tour suivant
                 </button>
@@ -981,7 +1075,7 @@ export default function Game() {
                     <h3 className="font-bold mb-2">{voter.name}</h3>
                     {!hasVoted && isCurrentVoter ? (
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm bg-[#7D4E1D]">
                           Votez pour éliminer un joueur :
                         </p>
                         <div className="grid gap-2">
@@ -1014,7 +1108,7 @@ export default function Game() {
                         }
                       </p>
                     ) : (
-                      <p className="text-gray-600">En attente de vote...</p>
+                      <p className="bg-[#7D4E1D]">En attente de vote...</p>
                     )}
                   </div>
                 );
@@ -1059,13 +1153,13 @@ export default function Game() {
                   onClick={() => {
                     initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
                   }}
-                  className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors"
                 >
                   Recommencer avec les mêmes joueurs
                 </button>
                 <button
                   onClick={() => window.location.reload()}
-                  className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors ml-4"
+                  className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors ml-4"
                 >
                   Nouvelle partie
                 </button>
@@ -1103,5 +1197,6 @@ export default function Game() {
     endGame();
   }, [gameState.winner, gameId]);
 
-  return <div className="min-h-screen bg-gray-100">{renderPhase()}</div>;
+  return <div className="min-h-screen bg-carte-acceuil bg-cover bg-center">{renderPhase()}</div>;
 }
+

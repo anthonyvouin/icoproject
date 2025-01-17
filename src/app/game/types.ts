@@ -19,7 +19,15 @@ export interface Player {
   id: number;
   name: string;
   role: Role;
-  bonusCard: Card;
+  bonusCard: Card | {
+    id: number;
+    nom: string;
+    description: string;
+    type: CardType;
+    image: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
   hasVoted: boolean;
   isInCrew: boolean;
   selectedCard: "ile" | "poison" | null;
@@ -52,6 +60,7 @@ export interface Card {
   nom: string;
   description: string;
   type: CardType;
+  image: string;
   createdAt: Date;
   updatedAt: Date;
 }

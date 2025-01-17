@@ -1,7 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -16,6 +16,74 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:'Cormorant Garamond', Arial, Helvetica, sans-serif;
+  position: relative; 
+  overflow: hidden; 
+}
+
+body::before {
+  content: '';
+  background-image: url('/img/carte_acceuil.jpg');
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  filter: blur(2px); 
+  z-index: -1; 
+}
+.cormorant-garamond-bold-italic {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+
+.curseur-personnalise::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 40px;
+  height: 40px;
+  background-image: url('/img/Fichier 5monogramme_ICO.svg');
+  background-size: cover;
+  cursor: pointer;
+}
+
+.curseur-personnalise::-moz-range-thumb {
+  width: 40px;
+  height: 40px;
+  background-image: url('/img/Fichier 5monogramme_ICO.svg');
+  background-size: cover;
+  cursor: pointer;
+}
+
+.curseur-personnalise::-ms-thumb {
+  width: 40px;
+  height: 40px;
+  background-image: url('/img/Fichier 5monogramme_ICO.svg');
+  background-size: cover;
+  cursor: pointer;
+}
+
+.mainContent {
+  flex: 1; /* Cela prend toute la place disponible dans la fenêtre */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  
+}
+
+.footer {
+  background-color: rgba(233, 219, 194, 0.5);
+  color: white;
+  padding: 15px 20px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(0, 0, 0, 0.4);
+  background-image: linear-gradient(to bottom, rgba(233, 219, 194, 0.5), rgba(201, 181, 155, 0.5), rgba(168, 168, 168, 0.5));
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }

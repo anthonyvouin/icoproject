@@ -48,7 +48,7 @@ export const createActionDeck = () => {
   return shuffleArray([...actionCards]);
 };
 
-export const drawBonusCard = (deck: string[]) => {
+export const drawBonusCard = (deck: Card[]) => {
   if (deck.length === 0) return null;
   return deck.pop() || null;
 };
