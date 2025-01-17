@@ -25,7 +25,7 @@ export default function Footer() {
           }}
           className="flex flex-col py-2 xl rounded flex items-center justify-center"
         >
-          <img
+          <img 
             src="/img/capitaine_illu.png"
             alt="déconnexion"
             className="w-12 h-12 object-contain"
