@@ -12,6 +12,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        cormorant: ['"Cormorant Garamond"', 'serif'],
+      },
+      fontWeight: {
+        bold: '700',
+      },
+      fontStyle: {
+        italic: 'italic',
+      },
     },
   },
   plugins: [],

@@ -44,10 +44,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={geist.className}>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+      <body className={`${geist.className} flex flex-col min-h-screen`}>
+        <main className="flex-grow ">{children}</main>
       </body>
     </html>
   );
