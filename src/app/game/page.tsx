@@ -14,6 +14,7 @@ import {CardPopin, CardAction, CardConfirm, CardInfo} from "../../components/Car
 import { useRouter } from "next/navigation";
 
 export default function Game() {
+  const [currentVoterIndex, setCurrentVoterIndex] = useState(0); // Suivi du joueur actuel
   const [currentPlayerDistributionIndex, setCurrentPlayerDistributionIndex] = useState(0); 
   const router = useRouter();
 
@@ -259,23 +260,24 @@ export default function Game() {
   };
 
   const handleVoteForCaptain = (voterId: number, targetId: number) => {
-    setPopinMessage(`Est-ce que tu es sûr de vouloir voter pour ${gameState.players[targetId].name} ?`);
+    setPopinMessage(`Es-tu sûr de vouloir voter pour ${gameState.players[targetId].name} ?`);
     setShowCardPopin(true);
   
     const handleResponse = (response: boolean) => {
       if (!response) return;
   
-      setVotesForCaptain((prev) => {
-        const newVotes = { ...prev };
-        newVotes[voterId] = targetId;
+      setVotesForCaptain((prevVotes) => {
+        const updatedVotes = { ...prevVotes, [voterId]: targetId };
   
-        // Si tout le monde a voté, on détermine le capitaine
-        if (Object.keys(newVotes).length === gameState.players.length) {
+        // Vérifier si tous les joueurs ont voté
+        if (Object.keys(updatedVotes).length === gameState.players.length) {
+          // Compter les votes pour chaque joueur
           const voteCounts: { [key: number]: number } = {};
-          Object.values(newVotes).forEach((vote) => {
+          Object.values(updatedVotes).forEach((vote) => {
             voteCounts[vote] = (voteCounts[vote] || 0) + 1;
           });
   
+          // Trouver le joueur avec le plus de votes
           let maxVotes = 0;
           let captainId = 0;
           Object.entries(voteCounts).forEach(([playerId, votes]) => {
@@ -285,19 +287,24 @@ export default function Game() {
             }
           });
   
-          setGameState((prev) => ({
-            ...prev,
+          // Passer à l'étape suivante avec le capitaine sélectionné
+          setGameState((prevState) => ({
+            ...prevState,
             phase: "distribution",
             currentCaptain: captainId,
           }));
         }
   
-        return newVotes;
+        return updatedVotes;
       });
+  
+      // Passer au joueur suivant si ce n'est pas le dernier
+      setCurrentVoterIndex((prevIndex) => Math.min(prevIndex + 1, gameState.players.length - 1));
     };
   
-    setOnPopinResponse(() => handleResponse); // Enregistrez la fonction pour être utilisée par la modale.
+    setOnPopinResponse(() => handleResponse);
   };
+  
 
   // Confirmation de l'équipage
   const handleConfirmCrew = () => {
@@ -640,58 +647,63 @@ export default function Game() {
             <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4">
               Élection du Capitaine
             </h2>
-            <div className="grid grid-cols-2">
-              {gameState.players.map((voter, index) => {
-                // Vérifier si le joueur a déjà voté
-                const hasVoted = votesForCaptain[voter.id] !== undefined;
 
-                // Vérifier si c'est le tour du joueur actuel
-                const isCurrentVoter =
-                  Object.keys(votesForCaptain).length === index;
-
-                return (
-                  <div 
-                    key={voter.id} 
-                    className="p-4 m-4 bg-[#383837] border rounded-lg"
-                  >
-                    <h3 className="font-bold mb-2 text-[#E9DAC2]">{voter.name}</h3>
-                    {!hasVoted && isCurrentVoter ? (
-                      <div className="space-y-2 ">
-                        <p className="text-sm text-[#E9DBC2] mt-4">
-                          Votez pour un capitaine :
-                        </p>
-                        <div className="grid gap-2">
-                          {gameState.players
-                            .filter((p) => p.id !== voter.id)
-                            .map((candidate) => (
-                              <button
-                                key={candidate.id}
-                                className="bg-[#E9DBC2] text-black font-bold p-2 rounded transition-colors"
-                                onClick={() =>
-                                  handleVoteForCaptain(voter.id, candidate.id)
-                                }
-                              >
-                               {candidate.name}
-                              </button>
-                            ))}
-                        </div>
-                      </div>
-                    ) : hasVoted ? (
-                      <p className="bg-[#E9DBC2] text-black font-bold py-1 px-3 rounded transition-colors">
-                        A voté pour{" "}
-                        {
-                          gameState.players.find(
-                            (p) => p.id === votesForCaptain[voter.id]
-                          )?.name
-                        }
-                      </p>
-                    ) : (
-                      <p className="text-[#E9DAC2]">En attente de vote...</p>
-                    )}
+            {/* Affichage du joueur actuel */}
+            <div className="p-4 m-4 bg-[#383837] border rounded-lg text-white text-center">
+              <h3 className="font-bold text-lg mb-2">
+                {gameState.players[currentVoterIndex]?.name}
+              </h3>
+              {!votesForCaptain[gameState.players[currentVoterIndex]?.id] ? (
+                <div>
+                  <p className="text-sm text-[#E9DBC2] mt-4">
+                    {gameState.players[currentVoterIndex]?.name}, votez pour un capitaine :
+                  </p>
+                  <div className="grid gap-2 mt-4">
+                    {gameState.players
+                      .filter(
+                        (candidate) =>
+                          candidate.id !== gameState.players[currentVoterIndex]?.id
+                      )
+                      .map((candidate) => (
+                        <button
+                          key={candidate.id}
+                          className="bg-[#E9DBC2] text-black font-bold p-2 rounded transition-colors"
+                          onClick={() =>
+                            handleVoteForCaptain(
+                              gameState.players[currentVoterIndex]?.id,
+                              candidate.id
+                            )
+                          }
+                        >
+                          {candidate.name}
+                        </button>
+                      ))}
                   </div>
-                );
-              })}
+                </div>
+              ) : (
+                <p className="bg-[#E9DBC2] text-black font-bold py-1 px-3 rounded transition-colors">
+                  A voté pour{" "}
+                  {
+                    gameState.players.find(
+                      (p) =>
+                        p.id ===
+                        votesForCaptain[gameState.players[currentVoterIndex]?.id]
+                    )?.name
+                  }
+                </p>
+              )}
             </div>
+
+            {/* Passage à l'étape suivante après le dernier vote */}
+            {currentVoterIndex === gameState.players.length - 1 &&
+              Object.keys(votesForCaptain).length === gameState.players.length && (
+                <button
+                  onClick={handlePhaseChange}
+                  className="mt-4 bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg w-full"
+                >
+                  Terminer l'élection
+                </button>
+              )}
 
             {/* Affichage conditionnel de la modale */}
             {showCardPopin && (
@@ -706,8 +718,8 @@ export default function Game() {
             )}
           </div>
         );
+
       // Phase de distribution des rôles
-      
       case "distribution":
         const currentPlayer = gameState.players[currentPlayerDistributionIndex]; // Joueur actuel
       
@@ -1049,7 +1061,9 @@ export default function Game() {
                   <div className="flex mt-8 gap-4">
                     <button
                       onClick={() => {
-                        initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
+                        initializeGame(gameState.players.length, true); 
+                        setCurrentVoterIndex(0);
+                        setCurrentPlayerDistributionIndex(0);
                       }}
                       className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors"
                     >
@@ -1191,7 +1205,9 @@ export default function Game() {
               <div className="mt-8">
                 <button
                   onClick={() => {
-                    initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
+                    initializeGame(gameState.players.length, true); 
+                    setCurrentVoterIndex(0);
+                    setCurrentPlayerDistributionIndex(0);
                   }}
                   className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors"
                 >
