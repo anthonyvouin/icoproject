@@ -14,6 +14,7 @@ import {CardPopin, CardAction, CardConfirm, CardInfo} from "../../components/Car
 import { useRouter } from "next/navigation";
 
 export default function Game() {
+  const [currentPlayerDistributionIndex, setCurrentPlayerDistributionIndex] = useState(0); 
   const router = useRouter();
 
   const [gameState, setGameState] = useState<GameState>({
@@ -512,11 +513,13 @@ export default function Game() {
       case "setup":
         return (
           <div className="max-w-7xl mx-8 px-4 sm:px-8 lg:px-10 py-12 md:py-24 m-4">
-            <div className="bg-[#E9DBC2] rounded-lg shadow p-2 ">
-              <h2 className="text-black font-bold mb-4 ">Configuration de la partie</h2>
+            <div className="bg-[#E9DBC2] rounded-lg shadow p-4 mb-2">
+              <div className="bg-[#FFF7EE] rounded-lg shadow p-4">
+                <h2 className="text-black text-center font-bold">Configuration de la partie</h2>
+              </div>
                 
                 {/* Sélection du nombre de joueurs */}
-                <div className="mb-6 ">
+                <div>
                     {!validPlayersNumber && (
                       <div className="mb-4">
                         <label className="block text-gray-700 mb-2">Nombre de joueurs (7-20)</label>
@@ -651,7 +654,7 @@ export default function Game() {
                     key={voter.id} 
                     className="p-4 m-4 bg-[#383837] border rounded-lg"
                   >
-                    <h3 className="font-bold mb-2">{voter.name}</h3>
+                    <h3 className="font-bold mb-2 text-[#E9DAC2]">{voter.name}</h3>
                     {!hasVoted && isCurrentVoter ? (
                       <div className="space-y-2 ">
                         <p className="text-sm text-[#E9DBC2] mt-4">
@@ -683,7 +686,7 @@ export default function Game() {
                         }
                       </p>
                     ) : (
-                      <p className="bg-[#7D4E1D]">En attente de vote...</p>
+                      <p className="text-[#E9DAC2]">En attente de vote...</p>
                     )}
                   </div>
                 );
@@ -704,59 +707,105 @@ export default function Game() {
           </div>
         );
       // Phase de distribution des rôles
+      
       case "distribution":
+        const currentPlayer = gameState.players[currentPlayerDistributionIndex]; // Joueur actuel
+      
         return (
           <div className="max-w-4xl mx-auto p-4">
-            {/* Affichage des rôles */}
+            {/* Titre */}
             <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4">
               Distribution des rôles
             </h2>
+      
+            {/* Affichage du rôle du capitaine */}
             <p className="bg-[#E9DBC2] mt-2 text-black p-2 rounded-lg mb-4">
               Capitaine : {gameState.players[gameState.currentCaptain]?.name}
             </p>
-            <div className="grid grid-cols-2 gap-4">
-              {gameState.players.map((player) => (
-                <div key={player.id} className="p-4 bg-[#383837] border rounded-lg">
-                  <h3 className="font-bold">{player.name}</h3>
-                  <div className="flex gap-2 mt-2">
-                    <button onClick={() => handleShowPopin(player.id, 'role')}
-                      className="text-[#E9DBC2]"
-                    >
-                      Voir mon rôle
-                    </button>
-
-                    {player.bonusCard.nom && (
-                      <button onClick={() => handleShowPopin(player.id, 'bonus')}
-                        className="text-emerald-600"
-                      >
-                        Voir mon bonus
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+      
+            {/* Affichage du joueur actuel */}
+            <div className="p-4 bg-[#383837] border rounded-lg text-white text-center">
+              <h3 className="font-bold text-lg">{currentPlayer?.name}</h3>
+              <p className="mt-2">
+                {currentPlayerDistributionIndex === gameState.currentCaptain
+                  ? "Rôle : Capitaine"
+                  : "Rôle : Joueur"}
+              </p>
+      
+              <div className="flex gap-2 justify-center mt-4">
+                <button
+                  onClick={() => handleShowPopin(currentPlayer.id, "role")}
+                  className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg"
+                >
+                  Voir mon rôle
+                </button>
+      
+                {currentPlayer?.bonusCard?.nom && (
+                  <button
+                    onClick={() => handleShowPopin(currentPlayer.id, "bonus")}
+                    className="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg"
+                  >
+                    Voir mon bonus
+                  </button>
+                )}
+              </div>
             </div>
-
-            {/* Passage à la next step */}
-            <button
-              onClick={() => { setShowingRole(null); handlePhaseChange(); }}
-              className="mt-4 bg-[#E9DBC2] text-black font-black py-2 px-4 rounded-lg "
-            >
-              Fermer les yeux
-            </button>
-
+      
+            {/* Navigation entre les joueurs */}
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setCurrentPlayerDistributionIndex((prev) => Math.max(0, prev - 1))}
+                disabled={currentPlayerDistributionIndex === 0}
+                className={`py-2 px-4 rounded-lg ${
+                  currentPlayerDistributionIndex === 0
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-[#E9DBC2] text-black font-bold"
+                }`}
+              >
+                Précédent
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPlayerDistributionIndex((prev) =>
+                    Math.min(gameState.players.length - 1, prev + 1)
+                  )
+                }
+                disabled={currentPlayerDistributionIndex === gameState.players.length - 1}
+                className={`py-2 px-4 rounded-lg ${
+                  currentPlayerDistributionIndex === gameState.players.length - 1
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-[#E9DBC2] text-black font-bold"
+                }`}
+              >
+                Suivant
+              </button>
+            </div>
+      
+            {/* Passage à l'étape suivante */}
+            {currentPlayerDistributionIndex === gameState.players.length - 1 && (
+              <button
+                onClick={() => {
+                  setShowingRole(null);
+                  handlePhaseChange();
+                }}
+                className="mt-4 bg-[#E9DBC2] text-black font-black py-2 px-4 rounded-lg w-full"
+              >
+                Fermer les yeux
+              </button>
+            )}
+      
             {/* Affichage conditionnel de la modale */}
             {showCardPopin && selectedCardPopin && (
               <CardPopin nom={selectedCardPopin} onClose={() => setShowCardPopin(false)} />
             )}
           </div>
         );
-
+      
       // Phase de transition
       case "eyes-closed":
         return (
           <div className="flex justify-center items-center h-screen md:h-auto">
-            <div className="bg-[#383837] max-w-md mx-auto p-4 text-center rounded-lg md:max-w-lg lg:max-w-4xl">
+            <div className="bg-[#E9DBC2] mx-6 max-w-md mx-auto p-4 text-center rounded-lg md:max-w-lg lg:max-w-4xl">
               <h2 className="text-3xl font-bold mb-8">
                 Tout le monde ferme les yeux
               </h2>
@@ -766,7 +815,7 @@ export default function Game() {
               </p>
               <button
                 onClick={handlePhaseChange}
-                className="bg-[#E9DBC2] text-black py-2 px-4 rounded"
+                className="bg-[#383837] text-[#E9DBC2] py-2 px-4 rounded"
               >
                 Appeler les pirates et la sirène
               </button>
@@ -778,7 +827,7 @@ export default function Game() {
       case "eyes-open":
         return (
           <div className="flex justify-center items-center h-screen md:h-auto">
-            <div className="bg-[#383837] max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
+            <div className="bg-[#E9DBC2] max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
               <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
               <p className="mb-4">Regardez qui sont vos alliés...</p>
               <p className="text-2xl font-bold mb-4">
@@ -786,14 +835,15 @@ export default function Game() {
               </p>
               <button
                 onClick={handlePhaseChange}
-                className="bg-[#E9DBC2] text-black py-2 px-4 rounded"
+                className="bg-[#383837] text-[#E9DBC2] py-2 px-4 rounded"
               >
                 Ouvrer les yeux et commencer la partie
               </button>
             </div>
           </div>
         );
-      // Phase de sélection de l'équipage
+      
+        // Phase de sélection de l'équipage
       case "crew-selection":
         return (
           <div className="max-w-4xl mx-auto p-4 mt-6">
@@ -810,13 +860,10 @@ export default function Game() {
                     key={player.id}
                     onClick={() => selectCrewMember(player.id)}
                     className={`p-4 border text-black bg-[#E9DBC2] rounded-lg cursor-pointer ${
-                      player.isInCrew ? "bg-[#7D4E1D] border-white" : ""
+                      player.isInCrew ? "bg-[#FFF7EE] font-bold" : "bg-[#7D4E1D]"
                     }`}
                   >
                     <h3>{player.name}</h3>
-                    {player.isInCrew && (
-                      <span className="text-white ">Sélectionné</span>
-                    )}
                   </div>
                 ))}
               </div>
@@ -894,63 +941,57 @@ export default function Game() {
         );
 
       // Phase de révélation des cartes
-        case "reveal-cards":
-          return (
-            <div className="max-w-4xl mx-auto p-4 flex flex-col justify-between">
-              <div>
-                <h2 className="text-black font-bold mb-4 bg-[#E9DBC2] rounded-lg shadow p-2">
-                  Révélation des cartes
-                </h2>
-          
-          <div className="grid grid-cols-1 gap-4">
+      case "reveal-cards":
+        return (
+          <div className="max-w-4xl mx-auto p-4 flex flex-col justify-between">
+            <div>
+              <h2 className="text-black font-bold mb-4 bg-[#E9DBC2] rounded-lg shadow p-2">
+                Révélation des cartes
+              </h2>
+
+              <div className="grid grid-cols-1 gap-4">
                 {/* Container pour les cartes de l'équipage */}
-                <div className="grid grid-cols-1 gap-4 w-48 h-48">
+                <div className="grid grid-cols-3 gap-4">
                   {shuffleArray(gameState.selectedCrew).map((crewId) => {
                     // Récupérer le joueur correspondant à l'ID
                     const player = gameState.players.find((p) => p.id === crewId);
                     return (
-                      <div key={crewId}> {/* Le key doit être sur l'élément parent */}
-                        <div className="p-4 rounded-lg shadow border bg-[#E9DBC2] text-center">
-                          <div className="mt-2">
-                            {player?.selectedCard === "poison" ? (
-                              <div className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                                {/* Image Poison */}
-                                <img
-                                  src="/img/poison_illu.png"
-                                  alt="Poison"
-                                  className="w-full object-cover"
-                                />
-                                {/* Petit carré pour l'information */}
-                                <div className="absolute top-1 right-0 bg-[#383837] text-white rounded-none w-6 h-6 flex items-center justify-center text-xs font-bold">
-                                  Poison
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                                {/* Image Île */}
-                                <img
-                                  src="/img/ile-illu.png"
-                                  alt="Île"
-                                  className="w-full object-cover"
-                                />
-                              </div>
-                            )}
-                          </div>
+                      <div key={crewId} className="">
+                        <div className="mt-2">
+                          {player?.selectedCard === "poison" ? (
+                            <div className="relative bg-[#E9DBC2] border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                              {/* Image Poison */}
+                              <img
+                                src="/img/poison_illu.png"
+                                alt="Poison"
+                                className="w-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative bg-[#E9DBC2] border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                              {/* Image Île */}
+                              <img
+                                src="/img/ile-illu.png"
+                                alt="Île"
+                                className="w-full object-cover"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
-          
+
               {/* Résultat de la manche */}
-              <div className="text-center">
-                <p className="text-xl text-black rounded-lg shadow border bg-[#E9DBC2] rounded-lg mb-4">
-                  {gameState.playedCards.some((card) => card == "poison")
+              <div className="text-center mt-4">
+                <p className="text-lg text-black rounded-lg shadow border bg-[#E9DBC2] rounded-lg mb-4 p-4">
+                  {gameState.playedCards.some((card) => card === "poison")
                     ? "L'équipage a été empoisonné ! Les pirates gagnent la manche !"
                     : "L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !"}
                 </p>
-          
+
                 {/* Bouton pour voir le score */}
                 <button
                   onClick={handlePhaseChange}
@@ -959,11 +1000,10 @@ export default function Game() {
                   Voir le score
                 </button>
               </div>
-</div>
             </div>
-          );
-          
-          
+          </div>
+        );
+        
 
       // Phase de résultat
       case "result":
@@ -1006,7 +1046,7 @@ export default function Game() {
                     </button>
                   </>
                 ) : (
-                  <div className="mt-8">
+                  <div className="flex mt-8 gap-4">
                     <button
                       onClick={() => {
                         initializeGame(gameState.players.length, true); // Réinitialise avec les mêmes joueurs
