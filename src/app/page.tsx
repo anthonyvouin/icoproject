@@ -21,18 +21,19 @@ export default function HomePage() {
       {/* Contenu principal avec flex-grow pour pousser les colonnes vers le bas */}
       <div className="flex-grow">
         {/* Tableau des 4 lignes en bas de la page */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-24 w-full">
-          <div className="text-black font-cormorant font-bold italic grid grid-cols-1 gap-4 md:gap-8 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24 w-full">
+          <div className="text-black  font-bold grid grid-cols-1 gap-4 md:gap-8 w-full">
             {[
-              {
-                title: "Acheter le jeu",
-                link: "/online",
-                subtitle: "Commmandez en 2min",
-              },
+              
               {
                 title: "Jouer en local",
                 link: "/game",
                 subtitle: "7-20 joueurs",
+              },
+              {
+                title: "Acheter le jeu",
+                link: "/online",
+                subtitle: "Commmandez en 2min",
               },
             ].map((item, index) => (
               <div key={index} className="w-full bg-[#E9DBC2] rounded-lg p-2">
@@ -51,7 +52,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 }
