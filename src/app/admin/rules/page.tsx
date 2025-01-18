@@ -105,8 +105,8 @@ export default function AdminRules() {
 
   if (loading && rules.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-2xl text-indigo-600 font-semibold">
+      <div className="min-h-screen bg-[#E8DBC2] m-6 flex items-center justify-center">
+        <div className="animate-pulse text-2xl text-[#7D4E1D] font-semibold">
           Chargement...
         </div>
       </div>
@@ -114,50 +114,16 @@ export default function AdminRules() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="mt-8 ml-4 mr-4 sm:mt-12 sm:ml-6 sm:mr-6 lg:mt-16 lg:ml-8 lg:mr-8">
       <div className="max-w-7xl mx-auto">
-          <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
-            <div className="px-4 mb-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
-               <h1 className="text-3xl text-black font-bold mb-8">Gestion des règles</h1>
-             </div>
-
-      </div>
-        {/* Liste des règles existantes */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-xl text-black font-semibold mb-4">Règles existantes</h2>
-          <div className="space-y-4">
-            {rules.map((rule) => (
-              <div
-                key={rule.id}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg text-black font-medium">{rule.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Ordre d'affichage : {rule.order}
-                    </p>
-                    <p className="mt-2 text-gray-700">{rule.content}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(rule.id)}
-                    className="m-6 text-white px-3 py-1 rounded-md bg-[#383837] transition-colors duration-150"
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ))}
-            {rules.length === 0 && (
-              <p className="text-black text-gray-500 text-center py-4">
-                Aucune règle n'a été créée pour le moment.
-              </p>
-            )}
+        <div className="bg-[#E8DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
+          <div className="px-4 mb-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+            <h1 className="text-3xl text-black font-bold mb-8">Gestion des règles</h1>
           </div>
         </div>
 
         {/* Formulaire d'ajout */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <h2 className="text-xl text-black font-semibold mb-4">
             Ajouter une nouvelle règle
           </h2>
@@ -226,7 +192,7 @@ export default function AdminRules() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
-                className="mt-1 block w-full rounded-md border-black text-black  shadow-sm focus:border-black focus:ring-black sm:text-sm"
+                className="mt-2 p-2 block w-full rounded-md border-black border-2 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
 
@@ -245,7 +211,7 @@ export default function AdminRules() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, content: e.target.value }))
                 }
-                className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-2 p-2 block w-full rounded-md border-black border-2 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
 
@@ -268,7 +234,7 @@ export default function AdminRules() {
                     order: parseInt(e.target.value),
                   }))
                 }
-                className="mt-1 block w-full text-black rounded-md border-black border-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-s"
+                className="mt-2 p-2 block w-full text-black rounded-md border-black border-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-s"
               />
               <p className="mt-1 text-sm text-gray-500">
                 L'ordre détermine la position de la règle dans la liste (0 =
@@ -280,7 +246,7 @@ export default function AdminRules() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                className={`text-white font-bold px-3 py-1 rounded-md bg-[#7D4E1D] hover:bg-[#7D4E1D]/90 transition-colors duration-150 ${
                   loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -288,6 +254,39 @@ export default function AdminRules() {
               </button>
             </div>
           </form>
+
+        </div>
+        
+        {/* Liste des règles existantes */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <h2 className="text-xl text-black font-semibold mb-4">Règles existantes</h2>
+          <div className="space-y-4">
+            {rules.map((rule) => (
+              <div
+                key={rule.id}
+                className="border border-[#7D4E1D] rounded-lg p-4 hover:bg-[#E8DBC2] "
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg text-black font-medium">{rule.title}</h3>
+                    <p className="text-sm text-[#7D4E1D] mt-1">
+                      Ordre d'affichage : {rule.order}
+                    </p>
+                    <p className="mt-2 text-black">{rule.content}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(rule.id)}
+                    className="m-6 text-white px-3 py-1 rounded-md bg-[#7D4E1D] hover:bg-[#7D4E1D]/90 transition-colors duration-150"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            ))}
+            {rules.length === 0 && (
+              <p className="text-black text-center py-4">Aucune règle n'a été créée pour le moment.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
