@@ -24,9 +24,7 @@ export default function GameSettingsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Erreur lors du chargement des paramètres"
-        );
+        throw new Error(data.error || "Erreur lors du chargement des paramètres");
       }
 
       setSettings(data);
@@ -68,8 +66,8 @@ export default function GameSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-2xl text-indigo-600 font-semibold">
+      <div className="min-h-screen bg-indigo-100 flex items-center justify-center">
+        <div className="animate-pulse text-2xl text-[#7D4E1D] font-semibold">
           Chargement...
         </div>
       </div>
@@ -77,29 +75,54 @@ export default function GameSettingsPage() {
   }
 
   return (
-    <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
-      <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Paramètres du jeu
-          
-        </h3>
+    <div className="min-h-screen from-indigo-100 to-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-[#E8DBC2] py-8 px-4 shadow-xl rounded-lg sm:px-10">
+        <div className="flex-shrink-0">
+                  <div className="mx-auto h-20 w-20 rounded-full bg-[#7D4E1D] flex items-center justify-center mb-4">
+                    <svg
+                      className="h-10 w-10 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      {/* Cercle du chronomètre */}
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      {/* Aiguille du chronomètre */}
+                      <line
+                        x1="12"
+                        y1="12"
+                        x2="12"
+                        y2="6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      {/* Base du chronomètre */}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 2v2M12 14l4 4"
+                      />
+                    </svg>
+                  </div>
+                </div>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-black">Paramètres du jeu</h2>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
               <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+                <div className="flex-shrink-0"></div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
@@ -110,19 +133,6 @@ export default function GameSettingsPage() {
           {success && (
             <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
               <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-green-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
                 <div className="ml-3">
                   <p className="text-sm text-green-700">
                     Paramètres mis à jour avec succès !
@@ -136,36 +146,30 @@ export default function GameSettingsPage() {
             <div>
               <label
                 htmlFor="roundsToWin"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Nombre de manches pour gagner
               </label>
-              <div className="mt-1 ">
-                <input
-                  type="number"
-                  min="1"
-                  id="roundsToWin"
-                  value={settings?.roundsToWin || ""}
-                  onChange={(e) =>
-                    setSettings((prev) =>
-                      prev
-                        ? { ...prev, roundsToWin: parseInt(e.target.value) }
-                        : null
-                    )
-                  }
-                  className="shadow-sm  text-black focus:ring-black bg-[#E9DBC2] p-5 focus:border-black block w-full sm:text-sm border-gray-300 rounded-md"
-                />
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Nombre de manches qu'une équipe doit gagner pour remporter la
-                partie
-              </p>
+              <input
+                type="number"
+                min="1"
+                id="roundsToWin"
+                value={settings?.roundsToWin || ""}
+                onChange={(e) =>
+                  setSettings((prev) =>
+                    prev
+                      ? { ...prev, roundsToWin: parseInt(e.target.value) }
+                      : null
+                  )
+                }
+                className="appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm sm:text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+              />
             </div>
 
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center bg-[#383837]  py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-3 px-4 border rounded-lg shadow-sm text-m font-bold text-white bg-[#7D4E1D] disabled:opacity-50"
               >
                 Sauvegarder les modifications
               </button>
