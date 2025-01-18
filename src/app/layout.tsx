@@ -20,11 +20,22 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${geist.className} flex flex-col min-h-screen`}>
-        {/* Affiche le Header sauf sur la page d'accueil */}
-        {pathname !== "/" && <Header />}
-        <main className="flex-grow">{children}</main>
-        {/* Affiche le Footer sauf sur la page /game */}
-        {pathname !== "/game" && <Footer />}
+        {!pathname.startsWith("/admin") &&  pathname !== "/"  && (
+          <div className="fixed top-0 left-0 w-full z-50">
+            <Header />
+          </div>
+        )}
+
+        <div className="mt-20 z-10 relative flex-grow pb-20"> 
+          <main className="flex-grow">{children}</main>
+        </div>
+
+        {/* Footer fixé en bas */}
+        {!pathname.startsWith("/admin") && pathname !== "/game" && (
+          <div className="fixed bottom-0 left-0 w-full z-40">
+            <Footer />
+          </div>
+        )}
       </body>
     </html>
   );

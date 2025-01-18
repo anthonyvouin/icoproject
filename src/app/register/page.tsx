@@ -53,7 +53,7 @@ export default function RegisterPage() {
         <div className="bg-[#E8DBC2] py-8 px-4 shadow-xl rounded-lg sm:px-10">
           {/* Logo ou Avatar */}
           <div className="flex justify-center mb-8">
-            <div className="h-20 w-20 rounded-full bg-indigo-600 flex items-center justify-center">
+            <div className="h-20 w-20 rounded-full bg-[#7D4E1D] flex items-center justify-center">
               <svg
                 className="h-10 w-10 text-white"
                 fill="none"

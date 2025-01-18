@@ -11,7 +11,7 @@ export default function Header() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-5 border-b border-gray-200">
+    <nav className="bg-[#E9DBC2] fixed top-0 left-0 w-full z-5 border-b border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         {/* Logo */}
         <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">

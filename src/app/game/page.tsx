@@ -980,105 +980,48 @@ export default function Game() {
         return (
           <div className="max-w-4xl mx-auto p-4">
             <h2 className="bg-[#E9DBC2] rounded-lg shadow p-2 text-black font-bold">Phase de jeu</h2>
-            <div className="mt-4 shadow rounded-lg grid grid-cols-1 gap-4">
-              {gameState.selectedCrew.map((crewId: number, index: number) => { 
-                
+            <div className="mt-4 rounded-lg grid grid-cols-1 gap-3">
+              {gameState.selectedCrew.map((crewId, index) => {
+                // Récupérer le joueur correspondant à l'ID
                 const player = gameState.players.find((p) => p.id === crewId);
-            
-                
+
+                // Vérifier si c'est le tour du joueur actuel
                 const isCurrentPlayer = index === gameState.playedCards.length;
-                
                 return (
-                  <div key={crewId} className="p-4 bg-[#E9DBC2] border shadow">
+                  <div key={crewId} className="p-4 m-8 bg-[#F7F1E1] border border-[#E9DBC2] rounded-lg shadow-lg hover:shadow-2xl transition-shadow">
                     <h3 className="font-bold text-black">{player?.name}</h3>
-            
                     {isCurrentPlayer && !player?.selectedCard && (
                       <div className="mt-2 space-x-4 text-center">
                         <button
-                          onClick={() => {
-                            setShowCardPopin(true);  
-                            setPopinMessage(""); 
-                          }}
-                          className="bg-[#383837] text-white font-bold p-2 rounded-lg transition-colors"
+                          onClick={() => playCard(crewId, "ile")}
                         >
-                          Voter
+                          <CardAction nom={"ile"}  />
                         </button>
-                      </div>
+                        <button
+                          onClick={() => playCard(crewId, "poison")}
+                        >
+                          <CardAction nom={"poison"}  />
+                        </button>
+                       </div>
                     )}
-            
-                    {player?.selectedCard && <p className="font-bold text-[#7D4E1D]">Carte votée ✓</p>}
+                    {player?.selectedCard && <p className="font-bold text-[#7D4E1D]"> Carte jouée ✓</p>}
                     {!isCurrentPlayer && !player?.selectedCard && (
                       <p className="font-bold text-[#7D4E1D]">En attente...</p>
                     )}
-            
-                    {/* Affichage conditionnel de la modale */}
-                    {showCardPopin && isCurrentPlayer && (
-                      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <div className="max-w-2xl w-full bg-white border border-gray-200 rounded-lg shadow m-8">
-                          <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative h-[50vh] sm:h-[55vh] md:h-[50vh] lg:h-[50vh] xl:h-[50vh]">
-                            <button
-                              onClick={() => setShowCardPopin(false)}
-                              className="absolute top-2 right-2 text-gray-600 text-2xl"
-                            >
-                              ✕
-                            </button>
-                            <p className="text-center text-xl font-semibold text-black mb-6">
-                              Choisissez votre action
-                            </p>
-            
-                            <div className="grid gap-6 grid-cols-2 mx-auto mb-8">
-                              <button
-                                onClick={() => {
-                                  playCard(crewId, "ile");
-                                  setPopinMessage("île");
-                                  setShowCardPopin(false);
-                                }}
-                                className="bg-[#E9DBC2] text-white font-bold rounded-lg transition-colors w-full flex items-center justify-center"
-                              >
-                                <img 
-                                  src="/img/cartes_carte_ile.png" 
-                                  alt="Île" 
-                                  className="w-full h-[80%] object-contain" 
-                                />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  playCard(crewId, "poison");
-                                  setPopinMessage("poison");
-                                  setShowCardPopin(false);
-                                }}
-                                className="bg-[#E9DBC2] text-white font-bold rounded-lg transition-colors w-full flex items-center justify-center"
-                              >
-                                <img 
-                                  src="/img/carte_poison.png" 
-                                  alt="Poison" 
-                                  className="w-full h-[80%] object-contain" 
-                                />
-                              </button>
-                            </div>
-            
-                            <div className="flex justify-center mt-2">
-                              <button
-                                className="bg-[#7D4E1D] text-white font-bold py-3 px-10 rounded"
-                                onClick={() => setShowCardPopin(false)}
-                              >
-                                Fermer
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+
+                  {/* Affichage conditionnel de la modale */}
+                  {showCardPopin && (
+                    <CardInfo nom={popinMessage} onClose={() => setShowCardPopin(false)} />
+                  )}
                   </div>
                 );
               })}
             </div>
           </div>
-
         );
-        
-
-      // Phase de révélation des cartes
+       
+       
+        // Phase de révélation des cartes
       case "reveal-cards":
         return (
           <div className="max-w-4xl mx-auto p-4 flex flex-col justify-between">
@@ -1125,15 +1068,15 @@ export default function Game() {
               {/* Résultat de la manche */}
               <div className="text-center mt-4">
                 <div className="max-w-xl min-w-xl m-8">
-                  <p className="text-lg text-black rounded-lg shadow border bg-[#7D4E1D] rounded-lg mb-4 m-8 p-4">
+                  <p className="text-lg text-white rounded-lg shadow border bg-[#7D4E1D] rounded-lg mb-4 m-8 p-4">
                     {gameState.playedCards.some((card) => card === "poison") ? (
                       <>
-                        <img src="/img/cartes_carte_pirate.png" alt="Pirates" className="" />
+                        <img src="/img/cartes_carte_pirate.png" alt="Pirates" />
                         L'équipage a été empoisonné ! Les pirates gagnent la manche !
                       </>
                     ) : (
                       <>
-                        <img src="/img/cartes_carte_marin.png" alt="Marines" className="" />
+                        <img src="/img/cartes_carte_marin.png" alt="Marines" />
                         L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !
                       </>
                     )}
@@ -1176,12 +1119,17 @@ export default function Game() {
             {/* Résultat si une des deux équpe a gagné */}
             {gameState.score.pirates >= roundsForWin ||
             gameState.score.marines >= roundsForWin ? (
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4">Fin de la partie !</h3>
+              <div className="text-center bg-[#E9DBC2] p-4 rounded-lg shadow">
+                <h3 className="text-2xl text-black font-bold mb-4 ">Fin de la partie !</h3>
                 {gameState.score.pirates >= roundsForWin ? (
                   <>
-                    <p className="text-xl mb-4">Les Pirates ont gagné !</p>
-                    <p>Ils doivent maintenant identifier la Sirène...</p>
+                    <img 
+                      src="/img/cartes_carte_pirate.png"
+                      alt="Icône décorative" 
+                      className="inline-block"
+                    />
+                    <p className="text-xl text-black font-bold mb-4">Les Pirates ont gagné !</p>
+                    <p className="text-xl text-black font-bold mb-4">Ils doivent maintenant identifier la Sirène...</p>
                     <button
                       onClick={() =>
                         setGameState((prev) => ({
@@ -1189,7 +1137,7 @@ export default function Game() {
                           phase: "final-vote",
                         }))
                       }
-                      className="mt-4 bg-[#383837] text-white py-2 px-4 rounded-lg"
+                      className="mt-4 bg-[#383837] text-white font-bold py-2 px-4 rounded-lg"
                     >
                       Passer au vote final
                     </button>
@@ -1251,83 +1199,97 @@ export default function Game() {
 
       // Phase de vote final pirates/sirène
       case "final-vote":
-        // Sélection des pirates et de la sirène
-        const piratesAndSiren = gameState.players.filter(
-          (p) => p.role === "pirate" || p.role === "sirene"
-        );
+      // Sélection des pirates et de la sirène
+const piratesAndSiren = gameState.players.filter(
+  (p) => p.role === "pirate" || p.role === "sirene"
+);
+
+return (
+  <div className="max-w-4xl mx-auto p-4">
+    {/* Titre */}
+    <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md  p-4">
+      Vote Final - Trouver la Sirène
+    </h2>
+
+    {/* Instructions */}
+    <p className="bg-[#E9DBC2] text-black font-bold rounded-lg mt-6 mb-6 shadow-md p-4">
+      Pirates et Sirène, vous devez voter pour éliminer un joueur !
+    </p>
+
+    {/* Liste des votants */}
+    <div className="grid grid-cols-2 gap-4 rounded-lg">
+      {piratesAndSiren.map((voter, index) => {
+        // Vérifier si le joueur a déjà voté
+        const hasVoted = votesForSiren[voter.id] !== undefined;
+
+        // Vérifier si c'est le tour du joueur actuel
+        const isCurrentVoter = Object.keys(votesForSiren).length === index;
 
         return (
-          <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">
-              Vote Final - Trouver la Sirène
-            </h2>
-            <p className="text-lg mb-6">
-              Pirates et Sirène, vous devez voter pour éliminer un joueur !
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {piratesAndSiren.map((voter, index) => {
-                // Vérifier si le joueur a déjà voté
-                const hasVoted = votesForSiren[voter.id] !== undefined;
+          <div
+            key={voter.id}
+            className="p-4 bg-[#383837] border rounded-lg text-white"
+          >
+            <h3 className="font-bold mb-2 text-lg text-center">{voter.name}</h3>
 
-                // Vérifier si c'est le tour du joueur actuel
-                const isCurrentVoter =
-                  Object.keys(votesForSiren).length === index;
-
-                return (
-                  <div key={voter.id} className="p-4 border rounded">
-                    <h3 className="font-bold mb-2">{voter.name}</h3>
-                    {!hasVoted && isCurrentVoter ? (
-                      <div className="space-y-2">
-                        <p className="text-sm bg-[#7D4E1D]">
-                          Votez pour éliminer un joueur :
-                        </p>
-                        <div className="grid gap-2">
-                          {gameState.players
-                            .filter(
-                              (p) =>
-                                p.id !== voter.id &&
-                                (p.role === "pirate" || p.role === "sirene")
-                            )
-                            .map((suspect) => (
-                              <button
-                                key={suspect.id}
-                                className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition-colors"
-                                onClick={() =>
-                                  handleSirenVote(voter.id, suspect.id)
-                                }
-                              >
-                                Voter contre {suspect.name}
-                              </button>
-                            ))}
-                        </div>
-                      </div>
-                    ) : hasVoted ? (
-                      <p className="text-green-600">
-                        A voté contre{" "}
-                        {
-                          gameState.players.find(
-                            (p) => p.id === votesForSiren[voter.id]
-                          )?.name
-                        }
-                      </p>
-                    ) : (
-                      <p className="bg-[#7D4E1D]">En attente de vote...</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            {!hasVoted && isCurrentVoter ? (
+              <div className="space-y-2 ">
+                <p className="text-m text-white font-bold  p-2 rounded">
+                  Votez pour éliminer un joueur :
+                </p>
+                <div className="grid gap-2 rounded-lg">
+                  {gameState.players
+                    .filter(
+                      (p) =>
+                        p.id !== voter.id &&
+                        (p.role === "pirate" || p.role === "sirene")
+                    )
+                    .map((suspect) => (
+                      <button
+                        key={suspect.id}
+                        className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg hover:bg-[#C9B295] transition-colors"
+                        onClick={() => handleSirenVote(voter.id, suspect.id)}
+                      >
+                        Voter contre {suspect.name}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ) : hasVoted ? (
+              <p className="text-white font-bold text-center font-bold">
+                A voté contre{" "}
+                {
+                  gameState.players.find(
+                    (p) => p.id === votesForSiren[voter.id]
+                  )?.name
+                }
+              </p>
+            ) : (
+              <p className="bg-[#7D4E1D] text-white text-center py-2 rounded">
+                En attente de vote...
+              </p>
+            )}
           </div>
         );
-
+      })}
+    </div>
+  </div>
+);
       case "game-over":
         return (
-          <div className="max-w-4xl mx-auto p-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">Fin de la partie !</h2>
-            <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-[#E9DBC2] rounded-lg shadow p-4 m-6  mb-2">
+            <div className="bg-[#FFF7EE] rounded-lg shadow p-4 ">
+              <h2 className="text-black text-center font-bold">Fin de la partie !</h2>
+            </div>
+            <div className="bg-[#383837] rounded-lg p-6 m-6 shadow-lg relative">
               {gameState.winner === "pirates" && (
                 <>
-                  <h3 className="text-2xl text-red-600 font-bold mb-4">
+                  <img 
+                      src="/img/cartes_carte_pirate.png" 
+                      alt="pirate illustration"
+                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                    />
+                  <h3 className="text-2xl text-white font-bold mb-4">
                     Les Pirates ont gagné !
                   </h3>
                   <p className="text-lg mb-4">Ils ont trouvé la Sirène !</p>
@@ -1335,6 +1297,11 @@ export default function Game() {
               )}
               {gameState.winner === "marines" && (
                 <>
+                  <img 
+                      src="/img/cartes_carte_marin.png" 
+                      alt="pirate illustration"
+                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                    />
                   <h3 className="text-2xl text-blue-600 font-bold mb-4">
                     Les Marines ont gagné !
                   </h3>
@@ -1343,6 +1310,11 @@ export default function Game() {
               )}
               {gameState.winner === "sirene" && (
                 <>
+                  <img 
+                      src="/img/cartes_carte_sirene.png" 
+                      alt="pirate illustration"
+                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                    />
                   <h3 className="text-2xl text-purple-600 font-bold mb-4">
                     La Sirène a gagné !
                   </h3>
@@ -1354,23 +1326,24 @@ export default function Game() {
               <div className="mt-8">
                 <button
                   onClick={() => {
-                    initializeGame(gameState.players.length, true); 
+                    initializeGame(gameState.players.length, true);
                     setCurrentVoterIndex(0);
                     setCurrentPlayerDistributionIndex(0);
                   }}
-                  className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors"
+                  className="bg-[#E9DBC2] text-black font-bold py-2 px-6 mb-4 rounded-lg transition-colors"
                 >
                   Recommencer avec les mêmes joueurs
                 </button>
                 <button
                   onClick={() => window.location.reload()}
-                  className="bg-[#383837] text-white py-2 px-6 rounded-lg  transition-colors ml-4"
+                  className="bg-[#E9DBC2] text-black font-bold py-2 px-6 mb-4 rounded-lg transition-colors justify-center"
                 >
                   Nouvelle partie
                 </button>
               </div>
             </div>
           </div>
+
         );
 
       default:
