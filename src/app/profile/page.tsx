@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick"; 
 
 interface UserProfile {
   id: number;
@@ -16,6 +19,13 @@ interface Game {
   endDate: string;
   user_id: number;
 }
+const settings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+};
 
 export default function ProfilePage() {
   const [parties, setParties] = useState<Game[]>([]);
@@ -31,14 +41,14 @@ export default function ProfilePage() {
           fetch("/api/profile"),
           fetch("/api/game"),
         ]);
-  
+
         const profileData = await profileResponse.json();
         const gamesData = await gamesResponse.json();
-  
+
         if (!profileResponse.ok || !gamesResponse.ok) {
           throw new Error("Erreur lors du chargement des données");
         }
-  
+
         setProfile(profileData);
         const playerGames = gamesData.filter(
           (game: Game) => game.user_id == profileData.id
@@ -55,7 +65,7 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);  
 
@@ -95,10 +105,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-indigo-600 px-4 py-8 sm:px-6">
+    <div className="min-h-screen from-[#E8DBC2] to-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl  mx-auto">
+        <div className="rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-[#7D4E1D] px-4 py-8 sm:px-6">
             <div className="flex items-center justify-center">
               <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center">
                 <span className="text-4xl">
@@ -107,94 +117,113 @@ export default function ProfilePage() {
                 </span>
               </div>
             </div>
-            <div className="mt-4 text-center">
-              <h2 className="text-2xl font-bold text-white">
-                {profile?.name || "Utilisateur"}
-              </h2>
-              <p className="text-indigo-200">{profile?.email}</p>
+            <div className="max-w-3xl  mx-auto">
+                <div className="mt-4 text-center">
+                  <h2 className="text-2xl font-bold text-white">
+                    {profile?.name || "Utilisateur"}
+                  </h2>
+                  <p className="text-[#E8DBC2]">{profile?.email}</p>
+                </div>
             </div>
           </div>
-
-          <div className="px-4 py-5 sm:p-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-medium text-gray-500">
-                  ID Utilisateur
-                </h3>
-                <p className="mt-1 text-lg text-gray-900">{profile?.id}</p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-medium text-gray-500">
-                  Membre depuis
-                </h3>
-                <p className="mt-1 text-lg text-gray-900">
-                  {profile?.createdAt
-                    ? new Date(profile.createdAt).toLocaleDateString("fr-FR", {
-                        dateStyle: "long",
-                      })
-                    : "-"}
-                </p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-medium text-gray-500">
-                  Dernière mise à jour
-                </h3>
-                <p className="mt-1 text-lg text-gray-900">
-                  {profile?.updatedAt
-                    ? new Date(profile.updatedAt).toLocaleDateString("fr-FR", {
-                        dateStyle: "long",
-                      })
-                    : "-"}
-                </p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-medium text-gray-500">Statut</h3>
-                <div className="mt-1 flex items-center">
-                  <span className="h-3 w-3 bg-green-400 rounded-full mr-2"></span>
-                  <span className="text-lg text-gray-900">Actif</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h1 className="text-lg font-semibold">Vos badges</h1>
-              <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {parties.length > 0 ? (
-                <div className="bg-green-500 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="text-sm font-medium text-white">Le roi des partie</h3>
-                </div>
-                ) : ( 
-                  <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <h3 className="text-sm font-medium text-gray-500">Le roi des partie</h3>
-                  </div>
-                )
-                }
-
-                {partiesNigth.length > 0 ? (
-                <div className="bg-green-500 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="text-sm font-medium text-white">Couche Tard</h3>
-                </div>
-                ) : ( 
-                  <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <h3 className="text-sm font-medium text-gray-500">Couche Tard</h3>
-                  </div>
-                )
-                }
-              </div>
-            </div>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Modifier le profil
-              </button>
-              <button className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Changer le mot de passe
-              </button>
-            </div>
           </div>
-        </div>
+          
+
+            <div className="px-4 py-5 sm:p-6">
+              <div className="grid grid-cols-2 gap-2 rounded-lg  sm:grid-cols-2 lg:grid-cols-4">
+                <div className="bg-[#E9DBC2]   rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-m font-bold text-[#7D4E1D]">
+                    ID Utilisateur
+                  </h3>
+                  <p className="mt-1 text-lg text-[#7D4E1D]">{profile?.id}</p>
+                </div>
+
+                <div className="bg-[#E9DBC2]  rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-m font-bold text-[#7D4E1D]">
+                    Membre depuis
+                  </h3>
+                  <p className="mt-1 text-lg text-[#7D4E1D]">
+                    {profile?.createdAt
+                      ? new Date(profile.createdAt).toLocaleDateString("fr-FR", {
+                          dateStyle: "long",
+                        })
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="bg-[#E9DBC2]  rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-m font-bold text-[#7D4E1D]">
+                    Dernière mise à jour
+                  </h3>
+                  <p className="mt-1 text-lg text-[#7D4E1D]">
+                    {profile?.updatedAt
+                      ? new Date(profile.updatedAt).toLocaleDateString("fr-FR", {
+                          dateStyle: "long",
+                        })
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="bg-[#E9DBC2]  rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-m font-bold text-[#7D4E1D]">Statut</h3>
+                  <div className="mt-1 flex items-center">
+                    <span className="h-3 w-3 bg-green-400 rounded-full mr-2"></span>
+                    <span className="text-lg text-[#7D4E1D]">Actif</span>
+                  </div>
+                </div>
+              </div>
+           
+              <div>
+                  <div className="mt-8 px-4 py-5 sm:p-6 bg-[#E9DBC2]  rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <h1 className="text-lg font-semibold text-[#7D4E1D]">Vos badges</h1>
+                    <div className="mt-4">
+                      <Slider {...settings}>
+                        {parties.length > 0 ? (
+                          <div className="bg-[#7D4E1D] font-bold rounded-lg p-8 hover:shadow-md transition-shadow">
+                              <div className="relative w-full h-full mb-4">
+                                <img 
+                                  src="/trésor.webp"
+                                  alt="Badge Image"
+                                  className="relative  w-full h-full rounded-lg"
+                                />
+                              </div>
+                          <h3 className="text-m p-2 bg-[#F5E1B5] rounded-lg text-black font-bold flex items-center justify-center">Le roi des parties</h3>
+                        </div>
+                        ) : (
+                          <div className="bg-[#F5E1B5] rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <h3 className="text-m p-2 bg-[#F5E1B5] rounded-lg text-black font-bold flex items-center justify-center">Le roi des partie</h3>
+                          </div>
+                        )}
+
+                        {partiesNigth.length > 0 ? (
+                          <div className="bg-[#383837] rounded-lg p-8 hover:shadow-md transition-shadow">
+                            <h3 className="text-m p-2 bg-[#f5e1b5] rounded-lg text-black font-bold flex items-center justify-center">Couche Tard</h3>
+                          </div>
+                        ) : (
+                          <div className="bg-[#383837] rounded-lg p-8 hover:shadow-md transition-shadow ">
+                            <div className="relative w-full h-full mb-4">
+                                <img 
+                                  src="/hibou.webp" 
+                                  alt="badge couche tard "
+                                  className="object-cover w-full h-full rounded-lg"
+                                />
+                              </div>
+                            <h3 className="text-m p-2 bg-[#f5e1b5] rounded-lg text-black font-bold flex items-center justify-center">Couche Tard</h3>
+                          </div>
+                        )}
+                      </Slider>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-[#7D4E1D] hover:bg-[#8E5D2D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7D4E1D]">
+                      Modifier le profil
+                    </button>
+                    <button className="inline-flex items-center px-6 py-3 border border-[#F5E1B5] text-base font-medium rounded-md shadow-sm text-[#7D4E1D] bg-white hover:bg-[#F5E1B5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7D4E1D]">
+                      Changer le mot de passe
+                    </button>
+                  </div>
+              </div>
+            </div>
       </div>
     </div>
   );

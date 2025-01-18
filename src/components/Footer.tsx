@@ -2,35 +2,32 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="footer">
-      <div className="grid grid-cols-3 gap-4">
-        <Link href="/rules" className="py-2 xl rounded flex items-center justify-center">
-            <img
-              src="/img/parchemin logo.png"
-              alt="Logo du parchemin"
-              className="w-12 h-12 object-contain"
-            />
-        </Link>
+    <footer className="fixed bottom-0 left-0 w-full bg-[#E9DBC2] py-4">
+      <div className="flex justify-between items-center px-8">
+        <button 
+          className="w-16 h-16 rounded-full flex items-center justify-center bg-white bg-cover bg-center"
+          style={{ backgroundImage: 'url(/regle.jpg)' }}
+          onClick={() => window.location.href = "/rules"}
+        >
+          <span className="text-white">Règles</span>
+        </button>
 
-        <Link href="/profile" className="py-2 xl rounded flex items-center justify-center">
-          <img
-            src="/Icon - joueur-conf.png"
-            alt="Logo du parchemin"
-            className="w-12 h-12 object-contain"
-          />
-        </Link>
-        <button onClick={() => {
+        <button 
+          className="w-16 h-16 rounded-full flex items-center justify-center bg-white bg-cover bg-center"
+          style={{ backgroundImage: 'url(/Iconjoueur.webp)' }}
+          onClick={() => window.location.href = "/profile"}
+        >
+        </button>
+
+        <button 
+          onClick={() => {
             localStorage.clear();
             document.cookie = "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/";  // Redirige vers la page d'accueil après la déconnexion
           }}
-          className="flex flex-col py-2 xl rounded flex items-center justify-center"
+          className="w-16 h-16 rounded-full flex items-center justify-center bg-white bg-cover bg-center"
+          style={{ backgroundImage: 'url(/deconnexion.webp)' }}
         >
-          <img 
-            src="/img/capitaine_illu.png"
-            alt="déconnexion"
-            className="w-12 h-12 object-contain"
-          />
-          Se déconnecter
         </button>
       </div>
     </footer>

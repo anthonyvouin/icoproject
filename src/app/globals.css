@@ -18,15 +18,18 @@ body {
   color: var(--foreground);
   font-family:'Cormorant Garamond', Arial, Helvetica, sans-serif;
   position: relative; 
-  overflow: hidden; 
+  overflow-y: auto;
+  margin: 0; 
+  height: 100vh; 
 }
+   
 
 body::before {
   content: '';
   background-image: url('/img/carte_acceuil.jpg');
   background-size: cover;
   background-position: center;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -78,6 +81,10 @@ body::before {
 }
 
 .footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   background-color: rgba(233, 219, 194, 0.5);
   color: white;
   padding: 15px 20px;
@@ -86,4 +93,8 @@ body::before {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(0, 0, 0, 0.4);
   background-image: linear-gradient(to bottom, rgba(233, 219, 194, 0.5), rgba(201, 181, 155, 0.5), rgba(168, 168, 168, 0.5));
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Assure que le footer reste au-dessus des autres éléments */
 }
+
+
+

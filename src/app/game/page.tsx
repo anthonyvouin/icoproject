@@ -58,7 +58,7 @@ export default function Game() {
   const [votesForSiren, setVotesForSiren] = useState<{ [key: number]: number }>(
     {}
   );
-
+ 
   const [isTimerLoading, setIsTimerLoading] = useState(true);
 
   useEffect(() => {
@@ -150,27 +150,48 @@ export default function Game() {
     newIsFilled[index] = value.trim() !== "";
     setIsFilled(newIsFilled);
   };
-
+  
+  
   const handleShowPopin = (playerId: number, type: string) => {
-    // Demande de confirmation pour s'assurer que le joueur est bien celui qu'il prétend être
-    const confirmReveal = window.confirm(
-      "Êtes-ce que tu es bien " + gameState.players[playerId].name + " ?"
-    );
-
-    if (confirmReveal) {
+    // Ajout d'une confirmation stylisée
+    const confirmContainer = document.createElement("div");
+    confirmContainer.className =
+      "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+  
+    confirmContainer.innerHTML = `
+      <div class="bg-[#E8DBC2] rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Confirmation</h2>
+        <p class="text-gray-700 mb-6">
+          Êtes-vous bien ${gameState.players[playerId].name} ?
+        </p>
+        <div class="flex justify-center gap-4">
+          <button id="confirmYes" class="bg-[#7D4E1D] text-white px-4 py-2 rounded hover:bg-blue-700">Oui</button>
+          <button id="confirmNo" class="bg-[#383837] text-white px-4 py-2 rounded hover:bg-gray-400">Non</button>
+        </div>
+      </div>
+    `;
+  
+    document.body.appendChild(confirmContainer);
+  
+    // Gestion des clics sur les boutons
+    confirmContainer.querySelector("#confirmYes")?.addEventListener("click", () => {
       setShowingRole(playerId);
-      if(type === 'role') {
+      if (type === "role") {
         setSelectedCardPopin(gameState.players[playerId].role);
-        setShowCardPopin(true);
-      } else if(type === 'bonus') {
+      } else if (type === "bonus") {
         setSelectedCardPopin(gameState.players[playerId].bonusCard.nom);
-        setShowCardPopin(true);
-      } else if(type === 'action') {
+      } else if (type === "action") {
         setSelectedCardPopin(gameState.players[playerId].selectedCard);
-        setShowCardPopin(true);
       }
-    }
+      setShowCardPopin(true);
+      document.body.removeChild(confirmContainer);
+    });
+  
+    confirmContainer.querySelector("#confirmNo")?.addEventListener("click", () => {
+      document.body.removeChild(confirmContainer);
+    });
   };
+  
 
   // Ne pas afficher le timer tant qu'il n'est pas chargé
   const displayTimer = isTimerLoading ? null : timerForRoleRevel;
@@ -305,6 +326,8 @@ export default function Game() {
     setOnPopinResponse(() => handleResponse);
   };
   
+  const [showCandidates, setShowCandidates] = useState(false);
+  const [showCaptain, setShowCaptain] = useState(false);
 
   // Confirmation de l'équipage
   const handleConfirmCrew = () => {
@@ -644,55 +667,103 @@ export default function Game() {
       case "captain-vote":
         return (
           <div className="max-w-4xl mx-auto p-4">
-            <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4">
+            <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md p-4 mt-4">
               Élection du Capitaine
             </h2>
 
             {/* Affichage du joueur actuel */}
-            <div className="p-4 m-4 bg-[#383837] border rounded-lg text-white text-center">
-              <h3 className="font-bold text-lg mb-2">
-                {gameState.players[currentVoterIndex]?.name}
-              </h3>
-              {!votesForCaptain[gameState.players[currentVoterIndex]?.id] ? (
-                <div>
-                  <p className="text-sm text-[#E9DBC2] mt-4">
-                    {gameState.players[currentVoterIndex]?.name}, votez pour un capitaine :
-                  </p>
-                  <div className="grid gap-2 mt-4">
-                    {gameState.players
-                      .filter(
-                        (candidate) =>
-                          candidate.id !== gameState.players[currentVoterIndex]?.id
-                      )
-                      .map((candidate) => (
-                        <button
-                          key={candidate.id}
-                          className="bg-[#E9DBC2] text-black font-bold p-2 rounded transition-colors"
-                          onClick={() =>
-                            handleVoteForCaptain(
-                              gameState.players[currentVoterIndex]?.id,
-                              candidate.id
-                            )
-                          }
-                        >
-                          {candidate.name}
-                        </button>
-                      ))}
+            
+            <div className="flex items-center justify-center mt-20">
+              <div className="p-10 bg-[#383837] border rounded-lg text-white text-center">
+                
+                {!votesForCaptain[gameState.players[currentVoterIndex]?.id] ? (
+                <div className="w-full max-w-md mx-auto">
+                  <h3 className="font-bold text-lg mb-2 text-center">
+                    votez pour un capitaine :
+                  </h3>
+                  <div className="flex flex-col items-center w-full">
+                    <img 
+                      src="/img/logo_icon.png" 
+                      alt="Image du joueur" 
+                      className="bg-[#E9DBC2] text-black font-bold rounded-lg transition-colors mt-4 w-full"
+                    />
+                    <p className="border rounded-lg px-4 py-2 font-bold text-sm text-[#E9DBC2] mt-4 w-full text-center">
+                      {gameState.players[currentVoterIndex]?.name}, votez pour un capitaine :
+                    </p>
                   </div>
+                  <button
+                    className="bg-[#E9DBC2] text-black font-bold p-2 rounded-lg transition-colors mt-4 w-full"
+                    onClick={() => setShowCandidates(true)}
+                  >
+                    Afficher les candidats
+                  </button>
+                  {showCandidates && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                      <div className="w-full border border-gray-200 rounded-lg shadow m-8">
+                        <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative">
+                          <button
+                            onClick={() => setShowCandidates(false)}
+                            className="absolute top-2 right-2 text-gray-600 text-2xl"
+                          >
+                            ✕
+                          </button>
+                          <p className="text-center text-black font-semibold text-lg mb-4">
+                            {gameState.players[currentVoterIndex]?.name} ! votez pour votre prochain capitaine
+                          </p>
+
+                          <div className="grid gap-2">
+                            {gameState.players
+                              .filter(
+                                (candidate) =>
+                                  candidate.id !== gameState.players[currentVoterIndex]?.id
+                              )
+                              .map((candidate) => (
+                                <button
+                                  key={candidate.id}
+                                  className="bg-[#383837] text-white font-bold p-2 rounded-lg transition-colors w-full"
+                                  onClick={() => {
+                                    handleVoteForCaptain(
+                                      gameState.players[currentVoterIndex]?.id,
+                                      candidate.id
+                                    );
+                                    setShowCandidates(false);
+                                  }}
+                                >
+                                  {candidate.name}
+                                </button>
+                              ))}
+                          </div>
+
+                          <div className="flex justify-center mt-4">
+                            <button
+                              className="bg-[#7D4E1D] text-white font-bold py-2 px-8 rounded"
+                              onClick={() => setShowCandidates(false)}
+                            >
+                              Fermer
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
-              ) : (
-                <p className="bg-[#E9DBC2] text-black font-bold py-1 px-3 rounded transition-colors">
-                  A voté pour{" "}
-                  {
-                    gameState.players.find(
-                      (p) =>
-                        p.id ===
-                        votesForCaptain[gameState.players[currentVoterIndex]?.id]
-                    )?.name
-                  }
-                </p>
-              )}
+                
+                ) : (
+                  <p className="bg-[#E9DBC2] text-black font-bold py-1 px-3 rounded transition-colors">
+                    A voté pour{" "}
+                    {
+                      gameState.players.find(
+                        (p) =>
+                          p.id ===
+                          votesForCaptain[gameState.players[currentVoterIndex]?.id]
+                      )?.name
+                    }
+                  </p>
+                )}
+              </div>
             </div>
+          
 
             {/* Passage à l'étape suivante après le dernier vote */}
             {currentVoterIndex === gameState.players.length - 1 &&
@@ -703,7 +774,8 @@ export default function Game() {
                 >
                   Terminer l'élection
                 </button>
-              )}
+             
+             )}
 
             {/* Affichage conditionnel de la modale */}
             {showCardPopin && (
@@ -755,7 +827,7 @@ export default function Game() {
                 {currentPlayer?.bonusCard?.nom && (
                   <button
                     onClick={() => handleShowPopin(currentPlayer.id, "bonus")}
-                    className="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg"
+                    className="bg-[#7D4E1D] text-white font-bold py-2 px-4 rounded-lg"
                   >
                     Voir mon bonus
                   </button>
@@ -817,7 +889,7 @@ export default function Game() {
       case "eyes-closed":
         return (
           <div className="flex justify-center items-center h-screen md:h-auto">
-            <div className="bg-[#E9DBC2] mx-6 max-w-md mx-auto p-4 text-center rounded-lg md:max-w-lg lg:max-w-4xl">
+            <div className="p-10 m-6 bg-[#383837] border rounded-lg text-white text-center">
               <h2 className="text-3xl font-bold mb-8">
                 Tout le monde ferme les yeux
               </h2>
@@ -827,7 +899,7 @@ export default function Game() {
               </p>
               <button
                 onClick={handlePhaseChange}
-                className="bg-[#383837] text-[#E9DBC2] py-2 px-4 rounded"
+                className=" bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded"
               >
                 Appeler les pirates et la sirène
               </button>
@@ -839,7 +911,7 @@ export default function Game() {
       case "eyes-open":
         return (
           <div className="flex justify-center items-center h-screen md:h-auto">
-            <div className="bg-[#E9DBC2] max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
+            <div className="bg-[#383837]  max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
               <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
               <p className="mb-4">Regardez qui sont vos alliés...</p>
               <p className="text-2xl font-bold mb-4">
@@ -847,7 +919,7 @@ export default function Game() {
               </p>
               <button
                 onClick={handlePhaseChange}
-                className="bg-[#383837] text-[#E9DBC2] py-2 px-4 rounded"
+                className="bg-[#E9DBC2] text-black font-bold  py-2 px-4 rounded"
               >
                 Ouvrer les yeux et commencer la partie
               </button>
@@ -861,12 +933,10 @@ export default function Game() {
           <div className="max-w-4xl mx-auto p-4 mt-6">
             <h2 className="bg-[#E9DBC2] rounded-lg text-black font-bold shadow p-2">Sélection de l'équipage</h2>
             <p className="bg-[#E9DBC2] rounded-lg text-black font-bold shadow p-2 mt-20">
-              Capitaine : ({gameState.players[gameState.currentCaptain]?.name}) !
+             Le capitaine {gameState.players[gameState.currentCaptain]?.name}  doit désigner un équipage
             </p>
-            <div className="bg-[#383837] p-2 mt-2 mb-4 rounded-lg shadow">
-              <p className=" text-white font-bold mt-4 mb-2">sélectionnez 3 membres d'équipage :
-              </p>
-              <div className="grid  grid-cols-2 gap-4">
+            <div className="font-bold border mt-2 mb-4 rounded-lg shadow">
+              <div className="grid  gap-2">
                 {gameState.players.map((player) => (
                   <div
                     key={player.id}
@@ -908,49 +978,105 @@ export default function Game() {
       // Phase de jeu
       case "card-playing":
         return (
-          <div className="max-w-4xl mx-auto p-4 ">
+          <div className="max-w-4xl mx-auto p-4">
             <h2 className="bg-[#E9DBC2] rounded-lg shadow p-2 text-black font-bold">Phase de jeu</h2>
             <div className="mt-4 shadow rounded-lg grid grid-cols-1 gap-4">
-              {gameState.selectedCrew.map((crewId, index) => {
-                // Récupérer le joueur correspondant à l'ID
+              {gameState.selectedCrew.map((crewId: number, index: number) => { 
+                
                 const player = gameState.players.find((p) => p.id === crewId);
-
-                // Vérifier si c'est le tour du joueur actuel
+            
+                
                 const isCurrentPlayer = index === gameState.playedCards.length;
+                
                 return (
-                  <div key={crewId} className="p-4 bg-[#E9DBC2] border rounded shadow ">
+                  <div key={crewId} className="p-4 bg-[#E9DBC2] border shadow">
                     <h3 className="font-bold text-black">{player?.name}</h3>
+            
                     {isCurrentPlayer && !player?.selectedCard && (
                       <div className="mt-2 space-x-4 text-center">
                         <button
-                          onClick={() => playCard(crewId, "ile")}
+                          onClick={() => {
+                            setShowCardPopin(true);  
+                            setPopinMessage(""); 
+                          }}
+                          className="bg-[#383837] text-white font-bold p-2 rounded-lg transition-colors"
                         >
-                          <CardAction nom={"ile"}  />
-                        </button>
-                        <button
-                          onClick={() => playCard(crewId, "poison")}
-                        >
-                          <CardAction nom={"poison"}  />
+                          Voter
                         </button>
                       </div>
                     )}
-                    {player?.selectedCard && <p className="font-bold text-[#7D4E1D]"> Carte jouée ✓</p>}
+            
+                    {player?.selectedCard && <p className="font-bold text-[#7D4E1D]">Carte votée ✓</p>}
                     {!isCurrentPlayer && !player?.selectedCard && (
-                      <p className="font-bold text-[#7D4E1D]">
-                         En attente...
-                      </p>
+                      <p className="font-bold text-[#7D4E1D]">En attente...</p>
                     )}
-
-                  {/* Affichage conditionnel de la modale */}
-                  {showCardPopin && (
-                    <CardInfo nom={popinMessage} onClose={() => setShowCardPopin(false)} />
-                  )}
+            
+                    {/* Affichage conditionnel de la modale */}
+                    {showCardPopin && isCurrentPlayer && (
+                      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="max-w-2xl w-full bg-white border border-gray-200 rounded-lg shadow m-8">
+                          <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative h-[50vh] sm:h-[55vh] md:h-[50vh] lg:h-[50vh] xl:h-[50vh]">
+                            <button
+                              onClick={() => setShowCardPopin(false)}
+                              className="absolute top-2 right-2 text-gray-600 text-2xl"
+                            >
+                              ✕
+                            </button>
+                            <p className="text-center text-xl font-semibold text-black mb-6">
+                              Choisissez votre action
+                            </p>
+            
+                            <div className="grid gap-6 grid-cols-2 mx-auto mb-8">
+                              <button
+                                onClick={() => {
+                                  playCard(crewId, "ile");
+                                  setPopinMessage("île");
+                                  setShowCardPopin(false);
+                                }}
+                                className="bg-[#E9DBC2] text-white font-bold rounded-lg transition-colors w-full flex items-center justify-center"
+                              >
+                                <img 
+                                  src="/img/cartes_carte_ile.png" 
+                                  alt="Île" 
+                                  className="w-full h-[80%] object-contain" 
+                                />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  playCard(crewId, "poison");
+                                  setPopinMessage("poison");
+                                  setShowCardPopin(false);
+                                }}
+                                className="bg-[#E9DBC2] text-white font-bold rounded-lg transition-colors w-full flex items-center justify-center"
+                              >
+                                <img 
+                                  src="/img/carte_poison.png" 
+                                  alt="Poison" 
+                                  className="w-full h-[80%] object-contain" 
+                                />
+                              </button>
+                            </div>
+            
+                            <div className="flex justify-center mt-2">
+                              <button
+                                className="bg-[#7D4E1D] text-white font-bold py-3 px-10 rounded"
+                                onClick={() => setShowCardPopin(false)}
+                              >
+                                Fermer
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
           </div>
+
         );
+        
 
       // Phase de révélation des cartes
       case "reveal-cards":
@@ -974,7 +1100,7 @@ export default function Game() {
                             <div className="relative bg-[#E9DBC2] border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                               {/* Image Poison */}
                               <img
-                                src="/img/poison_illu.png"
+                                src="/img/carte_poison.png"
                                 alt="Poison"
                                 className="w-full object-cover"
                               />
@@ -983,7 +1109,7 @@ export default function Game() {
                             <div className="relative bg-[#E9DBC2] border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                               {/* Image Île */}
                               <img
-                                src="/img/ile-illu.png"
+                                src="/img/cartes_carte_ile.png"
                                 alt="Île"
                                 className="w-full object-cover"
                               />
@@ -998,20 +1124,31 @@ export default function Game() {
 
               {/* Résultat de la manche */}
               <div className="text-center mt-4">
-                <p className="text-lg text-black rounded-lg shadow border bg-[#E9DBC2] rounded-lg mb-4 p-4">
-                  {gameState.playedCards.some((card) => card === "poison")
-                    ? "L'équipage a été empoisonné ! Les pirates gagnent la manche !"
-                    : "L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !"}
-                </p>
+                <div className="max-w-xl min-w-xl m-8">
+                  <p className="text-lg text-black rounded-lg shadow border bg-[#7D4E1D] rounded-lg mb-4 m-8 p-4">
+                    {gameState.playedCards.some((card) => card === "poison") ? (
+                      <>
+                        <img src="/img/cartes_carte_pirate.png" alt="Pirates" className="" />
+                        L'équipage a été empoisonné ! Les pirates gagnent la manche !
+                      </>
+                    ) : (
+                      <>
+                        <img src="/img/cartes_carte_marin.png" alt="Marines" className="" />
+                        L'équipage est arrivé sain et sauf ! Les marines gagnent la manche !
+                      </>
+                    )}
+                  </p>
+                </div>
 
                 {/* Bouton pour voir le score */}
                 <button
                   onClick={handlePhaseChange}
-                  className="bg-[#383837] text-white py-2 px-4 rounded-lg hover:bg-[#2c2a29] transition-all"
+                  className="bg-[#383837] text-white py-2 px-4 rounded-lg hover:bg-[#2c2a29] transition-all mt-2"
                 >
                   Voir le score
                 </button>
               </div>
+
             </div>
           </div>
         );
@@ -1022,7 +1159,7 @@ export default function Game() {
         return (
           <div className="max-w-4xl mx-auto p-4">
             {/* Résultat du round */}
-            <h2 className="text-2xl text-black font-bold mb-6 bg-[#E9DBC2] rounded-lg shadow p-2">Résultat de la manche</h2>
+            <h2 className="text-lg text-black font-bold mb-6 bg-[#E9DBC2] rounded-lg shadow p-2">Résultat de la manche</h2>
             <div className="bg-white rounded-lg shadow p-6 mb-6">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="text-center">
@@ -1079,23 +1216,35 @@ export default function Game() {
                 )}
               </div>
             ) : (
-              <div className="text-center">
-                {/* Anonce du prochain capitaine */}
-                <p className="mb-4 text-black font-bold ">
-                  Le prochain capitaine sera :{" "}
-                  {
-                    gameState.players[
-                      (gameState.currentCaptain + 1) % gameState.players.length
-                    ].name
-                  }
-                </p>
-                <button
-                  onClick={nextRound}
-                  className="bg-[#383837] text-white py-2 px-4 rounded"
-                >
-                  Tour suivant
-                </button>
+              <div className="bg-[#7D4E1D] rounded-lg p-4 m-8 shadow-xl relative max-w-sm mx-auto">
+                  <div className="text-center w-full">
+                    <img 
+                      src="/img/capitaine_illu.png" 
+                      alt="Capitaine illustration"
+                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                    />
+
+                    {/* Texte annonçant le prochain capitaine */}
+                    <p className="text-black font-bold text-lg leading-relaxed mb-4">  {/* Réduction de la taille du texte */}
+                      Le prochain capitaine sera :{" "}
+                      <span className="text-md font-semibold">
+                        {gameState.players[
+                          (gameState.currentCaptain + 1) % gameState.players.length
+                        ].name}
+                      </span>
+                    </p>
+
+                    {/* Bouton pour passer au tour suivant */}
+                    <button
+                      onClick={nextRound}
+                      className="bg-[#383837] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4C4C4C] transition duration-300 w-full"
+                      aria-label="Passer au tour suivant"
+                    >
+                      Tour suivant
+                    </button>
+                  </div>
               </div>
+            
             )}
           </div>
         );

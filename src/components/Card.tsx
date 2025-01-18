@@ -36,8 +36,8 @@ export const CardPopin: React.FC<CardProps> = ({ nom, onClose }) => {
   return (
 
     card && (
-      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="max-w-md min-w-md bg-white border border-gray-200 rounded-lg shadow mx-8">
+      <div className=" fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="max-w-xl min-w-xl bg-white border border-gray-200 rounded-lg shadow m-8">
           <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative">
             <button
               onClick={onClose}
@@ -102,14 +102,12 @@ export const CardAction: React.FC<CardActionProps> = ({ nom }) => {
 
     card && (
     <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow">
-        <div className="bg-white rounded-lg p-6 shadow-lg relative">
                 <div className="flex items-center justify-center w-24">
-                    <img className="rounded-full" alt={"imageee-" + card.nom} 
+                    <img alt={"image-" + card.nom} 
                         src={card.image} 
                     />
                 </div>
-            <h5 className="mb-2 text-xl text-center font-bold tracking-tight text-gray-900">{card.nom}</h5>
-        </div>
+        
     </div>
     )
   );
@@ -132,7 +130,7 @@ export const CardConfirm: React.FC<CardProps & { onConfirm: (response: boolean) 
                     Non
                 </button>
                 <button onClick={() => handleResponse(true)}
-                    className="text-center bg-[#383837]  text-white font-bold py-2 px-10 rounded"
+                    className="text-center bg-[#383837]  text-white font-bold py-2 px-10 rounded-lg"
                 >
                     Oui
                 </button>
@@ -145,7 +143,7 @@ export const CardConfirm: React.FC<CardProps & { onConfirm: (response: boolean) 
 export const CardInfo: React.FC<CardProps> = ({ nom, onClose }) => {   
     return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="w-full bg-white mx-4 rounded-lg p-6 shadow-lg relative">
+        <div className="max-w-md bg-white mx-4 rounded-lg p-6 shadow-lg relative">
             <h5 className="mb-4 text-xl text-center text-gray-900">{nom}</h5>
             <div className="flex justify-center space-x-4">
                 <button onClick={() => onClose()}
@@ -158,3 +156,5 @@ export const CardInfo: React.FC<CardProps> = ({ nom, onClose }) => {
     </div>
     );
 };
+
+
