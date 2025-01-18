@@ -57,12 +57,12 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white py-8 px-4 shadow-xl rounded-2xl sm:px-10">
+    <div className="min-h-screen from-indigo-100 to-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-[#E8DBC2] py-8 px-4 shadow-xl rounded-lg sm:px-10">
           {/* En-tête */}
           <div className="text-center mb-8">
-            <div className="mx-auto h-20 w-20 rounded-full bg-indigo-600 flex items-center justify-center mb-4">
+            <div className="mx-auto h-20 w-20 rounded-full bg-[#7D4E1D] flex items-center justify-center mb-4">
               <svg
                 className="h-10 w-10 text-white"
                 fill="none"
@@ -77,10 +77,8 @@ export default function ContactPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-3xl font-extrabold text-gray-900">
-              Contactez-nous
-            </h2>
-            <p className="mt-2 text-gray-600">
+            <h2 className="text-3xl font-bold text-black">Contactez-nous</h2>
+            <p className="mt-2 text-black">
               Signalez un bug ou proposez une suggestion
             </p>
           </div>
@@ -97,7 +95,7 @@ export default function ContactPage() {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                       clipRule="evenodd"
                     />
                   </svg>
@@ -139,7 +137,7 @@ export default function ContactPage() {
             <div>
               <label
                 htmlFor="type"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Type de ticket
               </label>
@@ -148,7 +146,7 @@ export default function ContactPage() {
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                className="appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm sm:text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black hover:bg-white"
               >
                 <option value="BUG">Bug</option>
                 <option value="SUGGESTION">Suggestion</option>
@@ -158,7 +156,7 @@ export default function ContactPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Email
               </label>
@@ -169,14 +167,14 @@ export default function ContactPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm sm:text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
 
             <div>
               <label
                 htmlFor="message"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-black"
               >
                 Message
               </label>
@@ -187,14 +185,14 @@ export default function ContactPage() {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm sm:text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
 
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                className="w-full flex justify-center py-3 px-4 border rounded-lg shadow-sm text-m font-bold text-white bg-[#7D4E1D]"
               >
                 Envoyer
               </button>
