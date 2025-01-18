@@ -1,0 +1,66 @@
+[33m5cd35be[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/design[m[33m)[m feat: Mise à jour le design et ajout des assets pour la mise en page game
+[33m06213da[m Sauvegarde des modifications
+[33m2f1ee56[m Merge branch 'master' of github.com:anthonyvouin/icoproject into feature/design
+[33m07860c5[m Sauvegarde temporaire
+[33me62954f[m[33m ([m[1;31morigin/master[m[33m)[m Merge pull request #7 from anthonyvouin/add-role-management
+[33mcd266a8[m[33m ([m[1;31morigin/add-role-management[m[33m)[m test
+[33md9e3073[m ajout btn + footer déconexion
+[33ma3705b8[m Merge pull request #6 from anthonyvouin/add-role-management
+[33m76e2e2d[m vote capitaine
+[33m72c8d6a[m Merge pull request #5 from anthonyvouin/add-role-management
+[33m904f893[m amélioration de code
+[33mb3ddf19[m Merge pull request #4 from anthonyvouin/feature/design
+[33me4800f4[m[33m ([m[1;31morigin/feature/design[m[33m)[m feature/design
+[33m427a647[m Ajout du projet récupéré
+[33md02d77a[m add_prisma_url_card
+[33m7279db0[m add_conf
+[33m77d6184[m Merge pull request #3 from anthonyvouin/add-card
+[33mdfa79f7[m[33m ([m[1;31morigin/add-card[m[33m)[m Amélioration du code
+[33md04a5c9[m Ajout de CARD systeme Correction de tous les soucis
+[33mb86c344[m fix beug timer
+[33mb0b3f69[m Update page.tsx
+[33mcd9de1c[m delete game
+[33m2fee4b7[m add count game finish for admin
+[33m8db4c5e[m delete file
+[33maf26d8c[m add_game_user
+[33mdfde609[m add _middleware
+[33mf78b474[m add_game_start
+[33m641f472[m add_card_type
+[33m7b09d0e[m add timer
+[33m6159af3[m add timer
+[33m6cb2d0e[m add pointWin
+[33mc73354b[m Merge pull request #2 from anthonyvouin/config-game
+[33m8de0a29[m[33m ([m[1;31morigin/config-game[m[33m)[m Merge branch 'master' into config-game
+[33m37a6ae4[m ajouter vérifications des noms en double
+[33m8124186[m Validation de toutes les étapes du jeu
+[33meb84043[m add api setting game
+[33md8c58f6[m add rule
+[33m051f218[m Update page.tsx
+[33mf065167[m Update Header.tsx
+[33m9b3d702[m Merge pull request #1 from anthonyvouin/game-config-step
+[33m319041c[m[33m ([m[1;31morigin/game-config-step[m[33m)[m edit playeurs config
+[33md3970a9[m add vote sirene
+[33m62b81f3[m add_vote_capitain
+[33m5af8618[m add pwa
+[33m2645a02[m Update page.tsx
+[33m44711aa[m add game
+[33m6483f69[m add footer
+[33mee6c2d7[m add delete user
+[33mae23572[m add contact admin
+[33m94cb1b0[m add admin role and dashboard
+[33me9ef2f6[m add header
+[33m698aaac[m add contact
+[33m6e0e46c[m add Contact and read me
+[33me0b23d1[m update css
+[33m035c044[m update profile
+[33m4383499[m update middleware
+[33m5fd81ea[m fix error ts
+[33mf932e4f[m Update route.ts
+[33m5a0c274[m update
+[33mbbd88bf[m update
+[33m52afa83[m update
+[33mba84978[m add login
+[33m13ba107[m Update .gitignore
+[33mc90aca3[m update
+[33mf8e738f[m init project
+[33m0380723[m Initial commit from Create Next App

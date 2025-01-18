@@ -58,7 +58,7 @@ export default function Header() {
         >
           <ul className="bg-[#E9DBC2] font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
             {[
-              { href: "/", label: "Home" },
+              { href: "/", label: "acceuil" },
               { href: "/rules", label: "Règles du jeu" },
               { href: "/profile", label: "profil" },
             ].map((item, index) => (

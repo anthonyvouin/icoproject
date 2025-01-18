@@ -23,7 +23,8 @@ export default function RootLayout({
         {/* Affiche le Header sauf sur la page d'accueil */}
         {pathname !== "/" && <Header />}
         <main className="flex-grow">{children}</main>
-        <Footer />
+        {/* Affiche le Footer sauf sur la page /game */}
+        {pathname !== "/game" && <Footer />}
       </body>
     </html>
   );
