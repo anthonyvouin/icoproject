@@ -90,18 +90,18 @@ export default function Cards() {
     <div className="min-h-screen bg-gray-50">
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
+          <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
             <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
                 Mettre à jour une carte
               </h3>
             </div>
-
+            
             <div className="px-4 py-2 sm:p-6">
               <div>
                 <select
                   id="card-select"
-                  className="mt-1 block border w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  className="mt-1  block border w-full pl-3 pr-10 py-2 text-black text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                   value={selectedCard?.id || ""}
                   onChange={handleCardChange}
                 >

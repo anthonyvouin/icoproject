@@ -77,9 +77,11 @@ export default function GameSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">Paramètres du jeu</h1>
+    <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
+      <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Paramètres du jeu
+          
+        </h3>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
           {error && (
@@ -138,7 +140,7 @@ export default function GameSettingsPage() {
               >
                 Nombre de manches pour gagner
               </label>
-              <div className="mt-1">
+              <div className="mt-1 ">
                 <input
                   type="number"
                   min="1"
@@ -151,7 +153,7 @@ export default function GameSettingsPage() {
                         : null
                     )
                   }
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm  text-black focus:ring-black bg-[#E9DBC2] p-5 focus:border-black block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </div>
               <p className="mt-2 text-sm text-gray-500">
@@ -163,7 +165,7 @@ export default function GameSettingsPage() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center bg-[#383837]  py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sauvegarder les modifications
               </button>
