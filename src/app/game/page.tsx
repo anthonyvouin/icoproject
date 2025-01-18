@@ -911,7 +911,7 @@ export default function Game() {
       case "eyes-open":
         return (
           <div className="flex justify-center items-center h-screen md:h-auto">
-            <div className="bg-[#383837]  max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
+            <div className="bg-[#383837] text-white max-w-md mx-auto p-4 text-center rounded-lg shadow md:max-w-lg lg:max-w-4xl">
               <h2 className="text-3xl font-bold mb-8">Pirates et Sirène</h2>
               <p className="mb-4">Regardez qui sont vos alliés...</p>
               <p className="text-2xl font-bold mb-4">
@@ -988,7 +988,7 @@ export default function Game() {
                 // Vérifier si c'est le tour du joueur actuel
                 const isCurrentPlayer = index === gameState.playedCards.length;
                 return (
-                  <div key={crewId} className="p-4 m-8 bg-[#F7F1E1] border border-[#E9DBC2] rounded-lg shadow-lg hover:shadow-2xl transition-shadow">
+                  <div key={crewId} className="p-4 m-8 bg-[#F7F1E1] border border-[#E9DBC2] rounded-lg shadow-lg transition-shadow">
                     <h3 className="font-bold text-black">{player?.name}</h3>
                     {isCurrentPlayer && !player?.selectedCard && (
                       <div className="mt-2 space-x-4 text-center">
@@ -1086,7 +1086,7 @@ export default function Game() {
                 {/* Bouton pour voir le score */}
                 <button
                   onClick={handlePhaseChange}
-                  className="bg-[#383837] text-white py-2 px-4 rounded-lg hover:bg-[#2c2a29] transition-all mt-2"
+                  className="bg-[#383837] text-white py-2 px-4 rounded-lg transition-all mt-2"
                 >
                   Voir le score
                 </button>
@@ -1185,7 +1185,7 @@ export default function Game() {
                     {/* Bouton pour passer au tour suivant */}
                     <button
                       onClick={nextRound}
-                      className="bg-[#383837] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4C4C4C] transition duration-300 w-full"
+                      className="bg-[#383837] text-white py-2 px-4 rounded-lg shadow-md transition duration-300 w-full"
                       aria-label="Passer au tour suivant"
                     >
                       Tour suivant
@@ -1247,7 +1247,7 @@ return (
                     .map((suspect) => (
                       <button
                         key={suspect.id}
-                        className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg hover:bg-[#C9B295] transition-colors"
+                        className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg transition-colors"
                         onClick={() => handleSirenVote(voter.id, suspect.id)}
                       >
                         Voter contre {suspect.name}
@@ -1292,7 +1292,7 @@ return (
                   <h3 className="text-2xl text-white font-bold mb-4">
                     Les Pirates ont gagné !
                   </h3>
-                  <p className="text-lg mb-4">Ils ont trouvé la Sirène !</p>
+                  <p className="text-lg text-white mb-4">Ils ont trouvé la Sirène !</p>
                 </>
               )}
               {gameState.winner === "marines" && (
@@ -1302,7 +1302,7 @@ return (
                       alt="pirate illustration"
                       className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
                     />
-                  <h3 className="text-2xl text-blue-600 font-bold mb-4">
+                  <h3 className="text-2xl text-white font-bold mb-4">
                     Les Marines ont gagné !
                   </h3>
                   <p className="text-lg mb-4">L'ordre est maintenu !</p>
