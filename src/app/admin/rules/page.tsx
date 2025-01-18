@@ -115,12 +115,16 @@ export default function AdminRules() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">Gestion des règles</h1>
+      <div className="max-w-7xl mx-auto">
+          <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
+            <div className="px-4 mb-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+               <h1 className="text-3xl text-black font-bold mb-8">Gestion des règles</h1>
+             </div>
 
+      </div>
         {/* Liste des règles existantes */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Règles existantes</h2>
+          <h2 className="text-xl text-black font-semibold mb-4">Règles existantes</h2>
           <div className="space-y-4">
             {rules.map((rule) => (
               <div
@@ -129,7 +133,7 @@ export default function AdminRules() {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-medium">{rule.title}</h3>
+                    <h3 className="text-lg text-black font-medium">{rule.title}</h3>
                     <p className="text-sm text-gray-500 mt-1">
                       Ordre d'affichage : {rule.order}
                     </p>
@@ -137,7 +141,7 @@ export default function AdminRules() {
                   </div>
                   <button
                     onClick={() => handleDelete(rule.id)}
-                    className="ml-4 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors duration-150"
+                    className="m-6 text-white px-3 py-1 rounded-md bg-[#383837] transition-colors duration-150"
                   >
                     Supprimer
                   </button>
@@ -145,7 +149,7 @@ export default function AdminRules() {
               </div>
             ))}
             {rules.length === 0 && (
-              <p className="text-gray-500 text-center py-4">
+              <p className="text-black text-gray-500 text-center py-4">
                 Aucune règle n'a été créée pour le moment.
               </p>
             )}
@@ -154,7 +158,7 @@ export default function AdminRules() {
 
         {/* Formulaire d'ajout */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl text-black font-semibold mb-4">
             Ajouter une nouvelle règle
           </h2>
 
@@ -222,7 +226,7 @@ export default function AdminRules() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-black text-black  shadow-sm focus:border-black focus:ring-black sm:text-sm"
               />
             </div>
 
@@ -241,7 +245,7 @@ export default function AdminRules() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, content: e.target.value }))
                 }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
 
@@ -264,7 +268,7 @@ export default function AdminRules() {
                     order: parseInt(e.target.value),
                   }))
                 }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-1 block w-full text-black rounded-md border-black border-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-s"
               />
               <p className="mt-1 text-sm text-gray-500">
                 L'ordre détermine la position de la règle dans la liste (0 =

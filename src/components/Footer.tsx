@@ -9,7 +9,6 @@ export default function Footer() {
           style={{ backgroundImage: 'url(/regle.jpg)' }}
           onClick={() => window.location.href = "/rules"}
         >
-          <span className="text-white">Règles</span>
         </button>
 
         <button 
