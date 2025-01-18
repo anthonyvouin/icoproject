@@ -141,7 +141,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#E9DBC2]  flex items-center justify-center">
         <div className="animate-pulse text-2xl text-indigo-600 font-semibold">
           Chargement...
         </div>
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white from-indigo-100 to-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="md:flex flex-col md:items-center md:justify-between mb-8">

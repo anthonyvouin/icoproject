@@ -87,21 +87,21 @@ export default function Cards() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen m-7 rounded-lg  bg-gray-50 ">
+      <div className="py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
-            <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+            <div className="px-4 mb-2 py-3 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+              <h3 className="text-lg p-4 leading-6 font-medium text-gray-900">
                 Mettre à jour une carte
               </h3>
             </div>
-            
-            <div className="px-4 py-2 sm:p-6">
+
+            <div className="mx-6 sm:p-4">
               <div>
                 <select
                   id="card-select"
-                  className="mt-1  block border w-full pl-3 pr-10 py-2 text-black text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  className="mt-1 p-4  block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={selectedCard?.id || ""}
                   onChange={handleCardChange}
                 >
@@ -118,17 +118,19 @@ export default function Cards() {
 
               {selectedCard && (
                 <div>
-                  <div className="my-4">
+                  <div className="my-2">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                       Description
                     </label>
-                    <textarea id="description" value={description}
-                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                    <textarea
+                      id="description"
+                      value={description}
+                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md h-24"
                       onChange={(e) => setDescription(e.target.value)}
                     />
                   </div>
 
-                  <div className="my-4">
+                  <div className="my-2">
                     <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                       Image
                     </label>
@@ -142,7 +144,8 @@ export default function Cards() {
                   </div>
 
                   <button
-                    type="button" onClick={handleUpdateCard}
+                    type="button"
+                    onClick={handleUpdateCard}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Mettre à jour la carte
@@ -153,32 +156,32 @@ export default function Cards() {
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-lg mt-8">
-            <div className="px-4 py-5 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
+            <div className="px-4 py-4 sm:px-6 bg-white/50 backdrop-blur-sm rounded-t-lg">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
                 Liste des cartes
               </h3>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Nom
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date de création
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date de mise à jour
                     </th>
                   </tr>
@@ -189,20 +192,20 @@ export default function Cards() {
                       key={card.id}
                       className="hover:bg-gray-50 transition-colors duration-150 ease-in-out"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
                         #{card.id}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                        {card.nom}
+                          {card.nom}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 mx-20 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
                           {card.description}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             card.type === "ROLE"
@@ -213,14 +216,14 @@ export default function Cards() {
                           {card.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
                         {new Date(card.createdAt).toLocaleDateString("fr-FR", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
                         {new Date(card.updatedAt).toLocaleDateString("fr-FR", {
                           year: "numeric",
                           month: "long",
@@ -235,7 +238,10 @@ export default function Cards() {
           </div>
         </div>
       </div>
+</div>
 
-    </div>
+
+
+
   );
 }
