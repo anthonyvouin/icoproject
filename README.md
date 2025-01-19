@@ -1,4 +1,4 @@
-# Readme
+
 
 ## Introduction
 Ce projet est un **proof of concept (POC)** dans le cadre d’un projet RNCP. Il vise à digitaliser un jeu de rôle en créant une application qui gère automatiquement les différentes étapes du jeu et facilite l’expérience des joueurs. Ce POC présente une implémentation initiale et n'est pas encore destiné à une production finale.

@@ -13,7 +13,6 @@ export default function Header() {
   return (
     <nav className="bg-[#E9DBC2] fixed top-0 left-0 w-full z-5 border-b border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        {/* Logo */}
         <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
             src="/Fichier 4logo_ICO.svg"
@@ -22,7 +21,6 @@ export default function Header() {
           />
         </a>
 
-        {/* Burger Menu Button */}
         <button
           onClick={toggleMenu}
           data-collapse-toggle="navbar-default"
@@ -49,7 +47,6 @@ export default function Header() {
           </svg>
         </button>
 
-        {/* Menu */}
         <div
           className={`${
             isOpen ? "block" : "hidden"
@@ -58,9 +55,12 @@ export default function Header() {
         >
           <ul className="bg-[#E9DBC2] font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
             {[
-              { href: "/", label: "acceuil" },
+              { href: "/", label: "Accueil" },
               { href: "/rules", label: "Règles du jeu" },
-              { href: "/profile", label: "profil" },
+              { href: "/profile", label: "Profil" },
+              { href: "/game", label: "Jouer" },
+              { href: "/contact", label: "Contact" },
+
             ].map((item, index) => (
               <li
                 key={index}

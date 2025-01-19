@@ -610,7 +610,7 @@ export default function Game() {
                           <img
                             src={card.image}
                             alt={card.image}
-                            className="max-w-4xl mx-auto object-cover"
+                            className="w-full max-w-4xl mx-auto object-cover"
                           />
                           {/* Petit carré pour le nombre */}
                           <div className="absolute top-1 right-0 bg-[#383837] text-white rounded-none w-6 h-6 flex items-center justify-center text-xs font-bold">
@@ -1185,7 +1185,6 @@ export default function Game() {
                       </span>
                     </p>
 
-                    {/* Bouton pour passer au tour suivant */}
                     <button
                       onClick={nextRound}
                       className="bg-[#383837] text-white py-2 px-4 rounded-lg shadow-md transition duration-300 w-full"
@@ -1291,7 +1290,7 @@ export default function Game() {
                   <img 
                       src="/img/cartes_carte_pirate.png" 
                       alt="pirate illustration"
-                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                      className="rounded-lg mx-auto mb-4"  
                     />
                   <h3 className="text-2xl text-white font-bold mb-4">
                     Les Pirates ont gagné !
@@ -1304,7 +1303,7 @@ export default function Game() {
                   <img 
                       src="/img/cartes_carte_marin.png" 
                       alt="pirate illustration"
-                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                      className="rounded-lg mx-auto mb-4"  
                     />
                   <h3 className="text-2xl text-white font-bold mb-4">
                     Les Marines ont gagné !
@@ -1317,7 +1316,7 @@ export default function Game() {
                   <img 
                       src="/img/cartes_carte_sirene.png" 
                       alt="pirate illustration"
-                      className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
+                      className="rounded-lg mx-auto mb-4"  
                     />
                   <h3 className="text-2xl text-black font-bold mb-4">
                     La Sirène a gagné !
