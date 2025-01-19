@@ -62,6 +62,8 @@ export default function Header() {
               { href: "/rules", label: "Règles du jeu" },
               { href: "/profile", label: "Profil" },
               { href: "/game", label: "Jouer" },
+              { href: "/contact", label: "Contact" },
+
             ].map((item, index) => (
               <li
                 key={index}
