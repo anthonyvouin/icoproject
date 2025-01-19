@@ -87,7 +87,7 @@ export default function Cards() {
   };
 
   return (
-    <div className="min-h-screen m-7 rounded-lg  bg-gray-50 ">
+    <div className="min-h-screen m-7 ">
       <div className="py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-[#E9DBC2] backdrop-blur-sm shadow-lg rounded-lg mt-8">
@@ -119,37 +119,40 @@ export default function Cards() {
               {selectedCard && (
                 <div>
                   <div className="my-2">
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="description" className="block text-m font-medium text-gray-700">
                       Description
                     </label>
                     <textarea
                       id="description"
                       value={description}
-                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md h-24"
+                      className="mt-1 p-2 block w-full shadow-sm sm:text-sm text-black border-gray-300 rounded-md h-24"
                       onChange={(e) => setDescription(e.target.value)}
                     />
                   </div>
 
-                  <div className="my-2">
-                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                      Image
-                    </label>
-                    <input
-                      type="file"
-                      id="image"
-                      accept="image/*"
-                      className="mt-1 block w-full text-sm text-gray-500 border-gray-300 rounded-md"
-                      onChange={handleImageChange}
-                    />
+                  <div className="flex items-center justify-between my-2 space-x-4">
+                    <div className="flex-1">
+                      <label htmlFor="image" className="block text-m font-medium text-gray-700">
+                        Image
+                      </label>
+                      <input
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                        className="mt-1 block w-full text-m text-gray-500 border-gray-300 rounded"
+                        onChange={handleImageChange}
+                      />
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={handleUpdateCard}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-m font-medium rounded-md shadow-sm text-white bg-[#383837] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Mettre à jour la carte
+                      </button>
+                    </div>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleUpdateCard}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Mettre à jour la carte
-                  </button>
                 </div>
               )}
             </div>

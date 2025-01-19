@@ -167,14 +167,14 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto">
           <div className="md:flex flex-col md:items-center md:justify-between mb-8">
             <div className="flex-1 min-w-0 mb-4">
-              <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
                 Dashboard Administrateur
-              </h2>
+              </h1>
             </div>
             <div className="mt-4 flex md:mt-0 md:ml-4 space-x-4">
               <a
                 href="/admin/cards"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-m font-medium text-white bg-[#383837] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
                   className="mr-2 -ml-1 h-5 w-5"
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
               </a>
               <a
                 href="/admin/contacts"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-m font-medium text-white bg-[#383837] font-BOLD hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
                   className="mr-2 -ml-1 h-5 w-5"
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
               </a>
               <a
                 href="/admin/rules"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-m font-medium text-white bg-[#383837] font-BOLD hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
                   className="mr-2 -ml-1 h-5 w-5"
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
               </a>
               <Link
                 href="/admin/game-settings"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-m text-sm font-medium text-white bg-[#383837] font-BOLD hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
                   className="mr-2 -ml-1 h-5 w-5"
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
               </Link>
               <a
                 href="/admin/timer"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-m font-medium text-white bg-[#383837] font-BOLD hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
                   className="mr-2 -ml-1 h-5 w-5"

@@ -121,7 +121,7 @@ export const CardConfirm: React.FC<CardProps & { onConfirm: (response: boolean) 
 
     return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="w-full bg-white mx-4 rounded-lg p-6 shadow-lg relative">
+        <div className="w-full max-w-md mx-auto bg-white mx-4 rounded-lg p-6 shadow-lg relative">
             <h5 className="mb-4 text-xl text-center text-gray-900">{nom}</h5>
             <div className="flex justify-center space-x-4">
                 <button onClick={() => handleResponse(false)}

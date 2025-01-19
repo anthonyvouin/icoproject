@@ -699,53 +699,56 @@ export default function Game() {
                   </button>
                   {showCandidates && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                      <div className="w-full border border-gray-200 rounded-lg shadow m-8">
-                        <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative">
-                          <button
-                            onClick={() => setShowCandidates(false)}
-                            className="absolute top-2 right-2 text-gray-600 text-2xl"
-                          >
-                            ✕
-                          </button>
-                          <p className="text-center text-black font-semibold text-lg mb-4">
-                            {gameState.players[currentVoterIndex]?.name} ! votez pour votre prochain capitaine
-                          </p>
-
-                          <div className="grid gap-2">
-                            {gameState.players
-                              .filter(
-                                (candidate) =>
-                                  candidate.id !== gameState.players[currentVoterIndex]?.id
-                              )
-                              .map((candidate) => (
-                                <button
-                                  key={candidate.id}
-                                  className="bg-[#383837] text-white font-bold p-2 rounded-lg transition-colors w-full"
-                                  onClick={() => {
-                                    handleVoteForCaptain(
-                                      gameState.players[currentVoterIndex]?.id,
-                                      candidate.id
-                                    );
-                                    setShowCandidates(false);
-                                  }}
-                                >
-                                  {candidate.name}
-                                </button>
-                              ))}
-                          </div>
-
-                          <div className="flex justify-center mt-4">
+                      <div className="max-w-4xl mx-auto p-4">
+                        <div className="w-full border border-gray-200 rounded-lg shadow m-8">
+                          <div className="bg-[#E9DBC2] rounded-lg p-6 shadow-lg relative">
                             <button
-                              className="bg-[#7D4E1D] text-white font-bold py-2 px-8 rounded"
                               onClick={() => setShowCandidates(false)}
+                              className="absolute top-2 right-2 text-gray-600 text-2xl"
                             >
-                              Fermer
+                              ✕
                             </button>
+                            <p className="text-center text-black font-semibold text-lg mb-4">
+                              {gameState.players[currentVoterIndex]?.name} ! votez pour votre prochain capitaine
+                            </p>
+
+                            <div className="grid gap-2">
+                              {gameState.players
+                                .filter(
+                                  (candidate) =>
+                                    candidate.id !== gameState.players[currentVoterIndex]?.id
+                                )
+                                .map((candidate) => (
+                                  <button
+                                    key={candidate.id}
+                                    className="bg-[#383837] text-white font-bold p-2 rounded-lg transition-colors w-full"
+                                    onClick={() => {
+                                      handleVoteForCaptain(
+                                        gameState.players[currentVoterIndex]?.id,
+                                        candidate.id
+                                      );
+                                      setShowCandidates(false);
+                                    }}
+                                  >
+                                    {candidate.name}
+                                  </button>
+                                ))}
+                            </div>
+
+                            <div className="flex justify-center mt-4">
+                              <button
+                                className="bg-[#7D4E1D] text-white font-bold py-2 px-8 rounded"
+                                onClick={() => setShowCandidates(false)}
+                              >
+                                Fermer
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
+
 
                 </div>
                 
@@ -1067,7 +1070,7 @@ export default function Game() {
 
               {/* Résultat de la manche */}
               <div className="text-center mt-4">
-                <div className="max-w-xl min-w-xl m-8">
+                <div className="max-w-4xl mx-auto p-4 max-w-xl min-w-xl m-8 ">
                   <p className="text-lg text-white rounded-lg shadow border bg-[#7D4E1D] rounded-lg mb-4 m-8 p-4">
                     {gameState.playedCards.some((card) => card === "poison") ? (
                       <>
@@ -1199,89 +1202,90 @@ export default function Game() {
 
       // Phase de vote final pirates/sirène
       case "final-vote":
-      // Sélection des pirates et de la sirène
-const piratesAndSiren = gameState.players.filter(
-  (p) => p.role === "pirate" || p.role === "sirene"
-);
-
-return (
-  <div className="max-w-4xl mx-auto p-4">
-    {/* Titre */}
-    <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md  p-4">
-      Vote Final - Trouver la Sirène
-    </h2>
-
-    {/* Instructions */}
-    <p className="bg-[#E9DBC2] text-black font-bold rounded-lg mt-6 mb-6 shadow-md p-4">
-      Pirates et Sirène, vous devez voter pour éliminer un joueur !
-    </p>
-
-    {/* Liste des votants */}
-    <div className="grid grid-cols-2 gap-4 rounded-lg">
-      {piratesAndSiren.map((voter, index) => {
-        // Vérifier si le joueur a déjà voté
-        const hasVoted = votesForSiren[voter.id] !== undefined;
-
-        // Vérifier si c'est le tour du joueur actuel
-        const isCurrentVoter = Object.keys(votesForSiren).length === index;
+              // Sélection des pirates et de la sirène
+        const piratesAndSiren = gameState.players.filter(
+          (p) => p.role === "pirate" || p.role === "sirene"
+        );
 
         return (
-          <div
-            key={voter.id}
-            className="p-4 bg-[#383837] border rounded-lg text-white"
-          >
-            <h3 className="font-bold mb-2 text-lg text-center">{voter.name}</h3>
+          <div className="max-w-4xl mx-auto p-4">
+            {/* Titre */}
+            <h2 className="bg-[#E9DBC2] text-black font-bold rounded-lg shadow-md  p-4">
+              Vote Final - Trouver la Sirène
+            </h2>
 
-            {!hasVoted && isCurrentVoter ? (
-              <div className="space-y-2 ">
-                <p className="text-m text-white font-bold  p-2 rounded">
-                  Votez pour éliminer un joueur :
-                </p>
-                <div className="grid gap-2 rounded-lg">
-                  {gameState.players
-                    .filter(
-                      (p) =>
-                        p.id !== voter.id &&
-                        (p.role === "pirate" || p.role === "sirene")
-                    )
-                    .map((suspect) => (
-                      <button
-                        key={suspect.id}
-                        className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg transition-colors"
-                        onClick={() => handleSirenVote(voter.id, suspect.id)}
-                      >
-                        Voter contre {suspect.name}
-                      </button>
-                    ))}
-                </div>
-              </div>
-            ) : hasVoted ? (
-              <p className="text-white font-bold text-center font-bold">
-                A voté contre{" "}
-                {
-                  gameState.players.find(
-                    (p) => p.id === votesForSiren[voter.id]
-                  )?.name
-                }
-              </p>
-            ) : (
-              <p className="bg-[#7D4E1D] text-white text-center py-2 rounded">
-                En attente de vote...
-              </p>
-            )}
+            {/* Instructions */}
+            <p className="bg-[#E9DBC2] text-black font-bold rounded-lg mt-6 mb-6 shadow-md p-4">
+              Pirates et Sirène, vous devez voter pour éliminer un joueur !
+            </p>
+
+            {/* Liste des votants */}
+            <div className="grid grid-cols-2 gap-4 rounded-lg">
+              {piratesAndSiren.map((voter, index) => {
+                // Vérifier si le joueur a déjà voté
+                const hasVoted = votesForSiren[voter.id] !== undefined;
+
+                // Vérifier si c'est le tour du joueur actuel
+                const isCurrentVoter = Object.keys(votesForSiren).length === index;
+
+                return (
+                  <div
+                    key={voter.id}
+                    className="p-4 bg-[#383837] border rounded-lg text-white"
+                  >
+                    <h3 className="font-bold mb-2 text-lg text-center">{voter.name}</h3>
+
+                    {!hasVoted && isCurrentVoter ? (
+                      <div className="space-y-2 ">
+                        <p className="text-m text-white font-bold  p-2 rounded">
+                          Votez pour éliminer un joueur :
+                        </p>
+                        <div className="grid gap-2 rounded-lg">
+                          {gameState.players
+                            .filter(
+                              (p) =>
+                                p.id !== voter.id &&
+                                (p.role === "pirate" || p.role === "sirene")
+                            )
+                            .map((suspect) => (
+                              <button
+                                key={suspect.id}
+                                className="bg-[#E9DBC2] text-black font-bold py-2 px-4 rounded-lg transition-colors"
+                                onClick={() => handleSirenVote(voter.id, suspect.id)}
+                              >
+                                Voter contre {suspect.name}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    ) : hasVoted ? (
+                      <p className="text-white font-bold text-center font-bold">
+                        A voté contre{" "}
+                        {
+                          gameState.players.find(
+                            (p) => p.id === votesForSiren[voter.id]
+                          )?.name
+                        }
+                      </p>
+                    ) : (
+                      <p className="bg-[#7D4E1D] text-white text-center py-2 rounded">
+                        En attente de vote...
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         );
-      })}
-    </div>
-  </div>
-);
+              
       case "game-over":
         return (
           <div className="bg-[#E9DBC2] rounded-lg shadow p-4 m-6  mb-2">
             <div className="bg-[#FFF7EE] rounded-lg shadow p-4 ">
               <h2 className="text-black text-center font-bold">Fin de la partie !</h2>
             </div>
-            <div className="bg-[#383837] rounded-lg p-6 m-6 shadow-lg relative">
+            <div className="m-6  relative">
               {gameState.winner === "pirates" && (
                 <>
                   <img 
@@ -1315,10 +1319,10 @@ return (
                       alt="pirate illustration"
                       className="rounded-lg mx-auto mb-4"  // Réduction de la taille de l'image
                     />
-                  <h3 className="text-2xl text-purple-600 font-bold mb-4">
+                  <h3 className="text-2xl text-black font-bold mb-4">
                     La Sirène a gagné !
                   </h3>
-                  <p className="text-lg mb-4">
+                  <p className="text-lg text-black mb-4">
                     Les pirates n'ont pas réussi à la trouver !
                   </p>
                 </>
@@ -1330,13 +1334,13 @@ return (
                     setCurrentVoterIndex(0);
                     setCurrentPlayerDistributionIndex(0);
                   }}
-                  className="bg-[#E9DBC2] text-black font-bold py-2 px-6 mb-4 rounded-lg transition-colors"
+                  className="bg-[#383837] text-white font-bold py-2 px-6 mb-4 rounded-lg transition-colors"
                 >
                   Recommencer avec les mêmes joueurs
                 </button>
                 <button
                   onClick={() => window.location.reload()}
-                  className="bg-[#E9DBC2] text-black font-bold py-2 px-6 mb-4 rounded-lg transition-colors justify-center"
+                  className="bg-[#383837] text-white font-bold py-2 px-6 m-4 rounded-lg transition-colors justify-center"
                 >
                   Nouvelle partie
                 </button>
@@ -1375,6 +1379,5 @@ return (
     endGame();
   }, [gameState.winner, gameId]);
 
-  return <div className="min-h-screen bg-carte-acceuil bg-cover bg-center">{renderPhase()}</div>;
+  return <div className="max-w-4xl mx-auto p-4 min-h-screen bg-carte-acceuil bg-cover bg-center">{renderPhase()}</div>;
 }
-
