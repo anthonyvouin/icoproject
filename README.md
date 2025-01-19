@@ -60,7 +60,7 @@ Une fois le projet construit, vous pouvez démarrer le serveur en mode productio
 npm start
 ```
 
-### Alimenter la base de donnée avec le fichier seed
+### Alimenter la base de données avec le fichier seed
 Si vous devez alimenter la base de données, utilisez cette commande :
 ```bash
 npx prisma db seed
