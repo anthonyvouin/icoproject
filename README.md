@@ -7,7 +7,7 @@ git clone
 ```
 
 
-## Install les dépendances
+## Installer les dépendances
 
 ```bash
 npm install
