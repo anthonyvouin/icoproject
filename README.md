@@ -1,3 +1,19 @@
+
+## Récuprer le projet
+
+```bash
+git clone
+
+```
+
+
+## Installer les dépences
+
+```bash
+npm install
+
+```
+
 ## Run server 
 
 ```bash
