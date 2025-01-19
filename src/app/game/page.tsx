@@ -542,7 +542,7 @@ export default function Game() {
       // Phase de configuration de la partie
       case "setup":
         return (
-          <div className="max-w-7xl mx-8 px-4 sm:px-8 lg:px-10 py-12 md:py-24 m-4">
+          <div className="max-w-4xl mx-auto max-w-7xl mx-8 px-4 sm:px-8 lg:px-10 py-12 md:py-24 m-4">
             <div className="bg-[#E9DBC2] rounded-lg shadow p-4 mb-2">
               <div className="bg-[#FFF7EE] rounded-lg shadow p-4">
                 <h2 className="text-black text-center font-bold">Configuration de la partie</h2>
@@ -610,7 +610,7 @@ export default function Game() {
                           <img
                             src={card.image}
                             alt={card.image}
-                            className="w-full object-cover"
+                            className="max-w-4xl mx-auto object-cover"
                           />
                           {/* Petit carré pour le nombre */}
                           <div className="absolute top-1 right-0 bg-[#383837] text-white rounded-none w-6 h-6 flex items-center justify-center text-xs font-bold">
